@@ -258,8 +258,8 @@
   class Store {
     constructor(initialState) {
       this.state = Object.assign({}, initialState);
-      this.listeners = [];
-      this.reducers = [];
+      this.listener = () => null;
+      this.reducer = (state, _) => state;
     }
 
     static createStore(initialState) {
@@ -271,23 +271,23 @@
     }
 
     onAction(fn) {
-      this.reducers.push(fn);
+      this.reducer = fn;
     }
 
     onStateChanged(fn) {
-      this.listeners.push(fn);
+      this.listener = fn;
     }
 
     dispatch(action) {
       setImmediate(_ => {
         let oldState = Object.assign({}, this.state);
-        let newState = this.reducers.reduce((acc, reducer) => reducer(acc, action), this.state);
+        let newState = this.reducer(this.state, action);
 
         if (Object.deepEqual(newState, oldState))
           return;
 
         this.state = newState;
-        this.listeners.forEach(listener => listener(newState, oldState));
+        this.listener(newState, oldState);
       });
     }
   }
