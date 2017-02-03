@@ -26,6 +26,7 @@ Feel free to use the `Application.dispatch` method to set event listeners on the
 
 ## Example
 
+```
   <!DOCTYPE html>
   <html lang="en">
   <head>
@@ -64,3 +65,4 @@ Feel free to use the `Application.dispatch` method to set event listeners on the
     </script>
   </body>
   </html>
+```
