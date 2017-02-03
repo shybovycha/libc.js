@@ -26,43 +26,43 @@ Feel free to use the `Application.dispatch` method to set event listeners on the
 
 ## Example
 
-```
-  <!DOCTYPE html>
-  <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <title>libc.js example</title>
-    <script src="c.js"></script>
-  </head>
-  <body>
-    <div id="app"></div>
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>libc.js example</title>
+  <script src="c.js"></script>
+</head>
+<body>
+  <div id="app"></div>
 
-    <script>
-      let initialState = {
-        name: ''
-      };
+  <script>
+    let initialState = {
+      name: ''
+    };
 
-      let update = (state, message) => {
-        if (message.type == 'WELCOME')
-          return Object.assign({}, state, { name: message.name });
+    let update = (state, message) => {
+      if (message.type == 'WELCOME')
+        return Object.assign({}, state, { name: message.name });
 
-        return state;
-      };
+      return state;
+    };
 
-      let view = (state, dispatch) => {
-        return c('div', [
-          c('div', [
-            c('input', { id: 'name', type: 'text' }),
-            c('button', { click: () => dispatch({ type: 'WELCOME', name: document.querySelector('#name').value }) }, 'welcome')
-          ]),
-          c('div', { style: `visibility: ${ state.name.length ? 'visible' : 'hidden' };` }, `Hello, ${ state.name }!`)
-        ]);
-      };
+    let view = (state, dispatch) => {
+      return c('div', [
+        c('div', [
+          c('input', { id: 'name', type: 'text' }),
+          c('button', { click: () => dispatch({ type: 'WELCOME', name: document.querySelector('#name').value }) }, 'welcome')
+        ]),
+        c('div', { style: `visibility: ${ state.name.length ? 'visible' : 'hidden' };` }, `Hello, ${ state.name }!`)
+      ]);
+    };
 
-      let app = createApplication(initialState, update, view);
+    let app = createApplication(initialState, update, view);
 
-      app.mount(document.querySelector('#app'));
-    </script>
-  </body>
-  </html>
+    app.mount(document.querySelector('#app'));
+  </script>
+</body>
+</html>
 ```
