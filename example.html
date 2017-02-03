@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>libc.js example</title>
+  <script src="c.js"></script>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script>
+    let initialState = {
+      name: ''
+    };
+
+    let update = (state, message) => {
+      if (message.type == 'WELCOME')
+        return Object.assign({}, state, { name: message.name });
+
+      return state;
+    };
+
+    let view = (state, dispatch) => {
+      return c('div', [
+        c('div', [
+          c('input', { id: 'name', type: 'text' }),
+          c('button', { click: () => dispatch({ type: 'WELCOME', name: document.querySelector('#name').value }) }, 'welcome')
+        ]),
+        c('div', { style: `visibility: ${ state.name.length ? 'visible' : 'hidden' };` }, `Hello, ${ state.name }!`)
+      ]);
+    };
+
+    let app = createApplication(initialState, update, view);
+
+    app.mount(document.querySelector('#app'));
+  </script>
+</body>
+</html>
