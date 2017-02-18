@@ -20,7 +20,9 @@ If you want a minified version, compatible with browsers, not supporting ES6, us
 
 First, include `c.js` file in your page:
 
+```html
     <script src="c.js"></script>
+```
 
 Then, define three entities:
 
