@@ -1,0 +1,18 @@
+{
+  "name": "lib_c_js",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:shybovycha/libc.js.git",
+  "author": "Artem Shubovych <shybovycha@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "node ./node_modules/gulp/bin/gulp.js"
+  },
+  "dependencies": {
+    "babel-preset-babili": "~0.0.11",
+    "gulp": "~3.9.1",
+    "gulp-babel": "~6.1.2",
+    "gulp-rename": "~1.2.2",
+    "gulp-uglify": "~2.0.1"
+  }
+}
