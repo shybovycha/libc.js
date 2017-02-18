@@ -13,6 +13,20 @@
 
   let isDOM = val => VirtualDOMNode.prototype.isPrototypeOf(val);
 
+  let deepCopy = (val) => {
+    if (isArray(val))
+      return [].slice.call(val);
+
+    if (!isObject(val))
+      return val;
+
+    let ret = {};
+
+    Object.keys(val).forEach(k => ret[k] = deepCopy(val[k]));
+
+    return ret;
+  };
+
   let flatten = arr => arr.reduce((acc, e) => acc.concat(isArray(e) ? flatten(e) : [e]), []);
 
   let deepEqual = (obj1, obj2) => {
@@ -52,6 +66,7 @@
   };
 
   Object.deepEqual = deepEqual;
+  Object.deepCopy = deepCopy;
 
   let setImmediate = fn => setTimeout(fn, 0);
 
@@ -257,7 +272,7 @@
 
   class Store {
     constructor(initialState) {
-      this.state = Object.assign({}, initialState);
+      this.state = Object.deepCopy(initialState);
       this.listener = () => null;
       this.reducer = (state, _) => state;
     }
@@ -267,7 +282,7 @@
     }
 
     getState() {
-      return Object.assign({}, this.state);
+      return Object.deepCopy(this.state);
     }
 
     onAction(fn) {
@@ -280,7 +295,7 @@
 
     dispatch(action) {
       setImmediate(_ => {
-        let oldState = Object.assign({}, this.state);
+        let oldState = Object.deepCopy(this.state);
         let newState = this.reducer(this.state, action);
 
         if (Object.deepEqual(newState, oldState))
@@ -294,7 +309,7 @@
 
   class Application {
     constructor(initialState, updateFn, viewFn) {
-      this.store = new Store(initialState || {});
+      this.store = new Store(initialState);
 
       this.updateFn = updateFn;
       this.viewFn = viewFn;
