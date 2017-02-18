@@ -6,15 +6,9 @@ architectures and [http://mithril.js.org](Mithrill) library.
 
 ## Build
 
-Library is written in ES6 and is supported right away in majority of modern browsers.
-Thus, you'll need to build the library to create a minified version of it. Yet it is still
-possible to build minified version to run in older browsers.
-
 Prior to building a library, you'll need to install development tools: `npm install`.
 
-To build a minified version (but still written in ES6), use `npm run-script build`.
-
-If you want a minified version, compatible with browsers, not supporting ES6, use `npm run-script build-es5`.
+To build libc use `npm run-script build`.
 
 ## Use
 

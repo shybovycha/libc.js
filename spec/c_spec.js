@@ -1,13 +1,19 @@
+var utils = require('../src/utils.js');
+
 describe('libc', function () {
     describe('utilities', function () {
         describe('type checks', function () {
             describe('isObject', function () {
                 describe('for objects', function () {
-                    xit('returns true', function () {});
+                    it('returns true', function () {
+                        expect(utils.isObject({})).toBe(true);
+                    });
                 });
 
                 describe('for arrays', function () {
-                    xit('returns false', function () {});
+                    it('returns false', function () {
+                        expect(utils.isObject([])).toBe(false);
+                    });
                 });
 
                 describe('for functions', function () {
