@@ -1,7 +1,20 @@
-# libc.js
+# libc
 
-libc.js is a javascript framework which allows to create fast and robust applications.
-It has been highly inspired by Redux and Elm architectures and mithrill.js library.
+`libc` is a javascript framework which allows to create fast and robust applications.
+It has been highly inspired by [http://redux.js.org/](Redux) and [http://elm-lang.org](Elm)
+architectures and [http://mithril.js.org](Mithrill) library.
+
+## Build
+
+Library is written in ES6 and is supported right away in majority of modern browsers.
+Thus, you'll need to build the library to create a minified version of it. Yet it is still
+possible to build minified version to run in older browsers.
+
+Prior to building a library, you'll need to install development tools: `npm install`.
+
+To build a minified version (but still written in ES6), use `npm run-script build`.
+
+If you want a minified version, compatible with browsers, not supporting ES6, use `npm run-script build-es5`.
 
 ## Use
 
@@ -26,43 +39,59 @@ Feel free to use the `Application.dispatch` method to set event listeners on the
 
 ## Example
 
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>libc.js example</title>
-  <script src="c.js"></script>
-</head>
-<body>
-  <div id="app"></div>
+Note: more examples could be found in the `examples/` directory.
 
-  <script>
-    let initialState = {
-      name: ''
-    };
+### Counter
 
-    let update = (state, message) => {
-      if (message.type == 'WELCOME')
-        return Object.assign({}, state, { name: message.name });
+```js
+var initialState = 0;
 
-      return state;
-    };
+function update(state, message) {
+  if (message == 'INCREMENT')
+    return state + 1;
 
-    let view = (state, dispatch) => {
-      return c('div', [
-        c('div', [
-          c('input', { id: 'name', type: 'text' }),
-          c('button', { click: () => dispatch({ type: 'WELCOME', name: document.querySelector('#name').value }) }, 'welcome')
-        ]),
-        c('div', { style: `visibility: ${ state.name.length ? 'visible' : 'hidden' };` }, `Hello, ${ state.name }!`)
-      ]);
-    };
+  if (message == 'DECREMENT')
+    return state - 1;
 
-    let app = createApplication(initialState, update, view);
+  return state;
+};
 
-    app.mount(document.querySelector('#app'));
-  </script>
-</body>
-</html>
+function view(state, dispatch) {
+  return c('div', [
+    c('button', { click: () => dispatch('INCREMENT') }, 'Increment'),
+    c('button', { click: () => dispatch('DECREMENT') }, 'Decrement'),
+    c('div', `Count: ${ state }`)
+  ]);
+};
+
+createApplication(initialState, update, view).mount(document.body);
+```
+
+### Welcome app
+
+```js
+let initialState = {
+  name: ''
+};
+
+let update = (state, message) => {
+  if (message.type == 'WELCOME')
+    return Object.assign({}, state, { name: message.name });
+
+  return state;
+};
+
+let view = (state, dispatch) => {
+  return c('div', [
+    c('div', [
+      c('input', { id: 'name', type: 'text' }),
+      c('button', { click: () => dispatch({ type: 'WELCOME', name: document.querySelector('#name').value }) }, 'welcome')
+    ]),
+    c('div', { style: `visibility: ${ state.name.length ? 'visible' : 'hidden' };` }, `Hello, ${ state.name }!`)
+  ]);
+};
+
+let app = createApplication(initialState, update, view);
+
+app.mount(document.body);
 ```

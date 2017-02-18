@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>libc counter example</title>
+  <script src="../dist/c.min.js"></script>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script>
+    var initialState = 0;
+
+    function update(state, message) {
+      if (message == 'INCREMENT')
+        return state + 1;
+
+      if (message == 'DECREMENT')
+        return state - 1;
+
+      return state;
+    };
+
+    function view(state, dispatch) {
+      return c('div', [
+        c('button', { click: () => dispatch('INCREMENT') }, 'Increment'),
+        c('button', { click: () => dispatch('DECREMENT') }, 'Decrement'),
+        c('div', `Count: ${ state }`)
+      ]);
+    };
+
+    createApplication(initialState, update, view).mount(document.body);
+  </script>
+</body>
+</html>
