@@ -134,70 +134,47 @@ export class VirtualDOMNode {
     }
 }
 
-export class C {
-    constructor(tagName, _arg1, _arg2) {
-        let children, attrs, elt;
+export let c = function (tagName, _arg1, _arg2) {
+    let children, attrs, elt;
 
-        if (utils.isArray(_arg1)) {
-            children = _arg1.slice();
-        } else if (utils.isObject(_arg1)) {
-            attrs = _arg1;
+    if (utils.isArray(_arg1)) {
+        children = _arg1.slice();
+    } else if (utils.isObject(_arg1)) {
+        attrs = _arg1;
 
-            if (utils.isArray(_arg2))
-                children = _arg2.slice();
-            else
-                children = [_arg2];
+        if (utils.isArray(_arg2))
+            children = _arg2.slice();
+        else
+            children = [_arg2];
+    } else {
+        children = [_arg1];
+    }
+
+    children = children || [];
+    attrs = attrs || {};
+
+    elt = new VirtualDOMNode(tagName);
+
+    Object.keys(attrs).forEach((attrName) => {
+        let attrValue = attrs[attrName];
+
+        if (utils.isFunction(attrValue)) {
+            elt.addEventListener(attrName, attrValue);
         } else {
-            children = [_arg1];
+            elt.setAttribute(attrName, attrValue);
         }
+    });
 
-        children = children ? utils.flatten(children) : [];
-        attrs = attrs || {};
+    children.forEach((child) => {
+        if (typeof (child) === 'undefined' || child == null)
+            return;
 
-        elt = new VirtualDOMNode(tagName);
+        if (isDOM(child)) {
+            elt.appendChild(child);
+        } else {
+            elt.innerText = child;
+        }
+    });
 
-        Object.keys(attrs).forEach((attrName) => {
-            let attrValue = attrs[attrName];
-
-            if (utils.isFunction(attrValue)) {
-                elt.addEventListener(attrName, attrValue);
-            } else {
-                elt.setAttribute(attrName, attrValue);
-            }
-        });
-
-        children.forEach((child) => {
-            if (typeof (child) === 'undefined' || child == null)
-                return;
-
-            if (isDOM(child)) {
-                elt.appendChild(child);
-            } else if (child instanceof C) {
-                elt.appendChild(child.elt);
-            } else {
-                elt.innerText = child;
-            }
-        });
-
-        this.elt = elt;
-    }
-
-    mount(placeholder) {
-        this.elt.materialize(placeholder);
-    }
-
-    unmount() {
-        this.elt.parentElement.removeChild(this.elt);
-    }
-
-    on(evt, cb, sink) {
-        this.elt.addEventListener(evt, cb.bind(this), sink);
-    }
-
-    fire(evtName) {
-        var evt = new Event(evtName, [].slice.apply(arguments, 1));
-        this.elt.dispatchEvent(evt);
-    }
-}
-
-export let c = (tagName, _arg1, _arg2) => new C(tagName, _arg1, _arg2);
+    return elt;
+};

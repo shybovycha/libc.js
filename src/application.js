@@ -15,7 +15,7 @@ export class Application {
 
     mount(placeholder) {
         this.view = this.viewFn.call(null, this.store.getState(), this.dispatch.bind(this));
-        this.view.elt.materialize(placeholder);
+        this.view.materialize(placeholder);
     }
 
     dispatch(message) {
@@ -28,7 +28,7 @@ export class Application {
 
     _onStateChanged(state) {
         let newView = this.viewFn.call(null, state, this.dispatch.bind(this));
-        this.view.elt.applyChanges(newView.elt);
+        this.view.applyChanges(newView);
     }
 }
 

@@ -209,68 +209,6 @@ describe('libc', function () {
                     });
                 });
 
-                // these are immutable by language design
-                // dunno if I should test these cases
-
-                // describe('for number', function () {
-                //     xit('returns its value', function () {
-                //         var a = 3;
-                //         var b = utils.deepCopy(a);
-
-                //         a = 4;
-
-                //         expect(a).to.eql(4);
-                //         expect(b).to.eql(3);
-                //     });
-                // });
-
-                // describe('for boolean', function () {
-                //     xit('returns its value', function () {
-                //         var a = false;
-                //         var b = utils.deepCopy(a);
-
-                //         a = true;
-
-                //         expect(a).to.be.true;
-                //         expect(b).to.be.false;
-                //     });
-                // });
-
-                // xdescribe('for string', function () {
-                //     xit('returns its value', function () {
-                //         var a = 'moofoo';
-                //         var b = utils.deepCopy(a);
-
-                //         expect(b).not.to.be(a);
-                //     });
-                // });
-
-                // xdescribe('for function', function () {
-                //     xit('returns reference', function () {
-                //         var ctx1 = { name: 'moo' };
-                //         var ctx2 = { name: 'bar' };
-
-                //         var a = (function () { return this.name; }).bind(ctx1);
-                //         var b = utils.deepCopy(a);
-
-                //         a.bind(ctx2);
-
-                //         expect(a).toNotEqual(b);
-                //     });
-                // });
-
-                // xdescribe('for null', function () {
-                //     xit('returns its value', function () {
-                //         var a = null;
-                //         var b = utils.deepCopy(a);
-
-                //         a = 1;
-
-                //         expect(a).toBe(1);
-                //         expect(b).toBe(null);
-                //     });
-                // });
-
                 describe('for object', function () {
                     it('creates a copy', function () {
                         var a = { name: 'moo' };
@@ -303,86 +241,6 @@ describe('libc', function () {
                     it('returns one-dimensional array', function () {
                         expect(utils.flatten([ 1, [ 2, 3, [ 4 ], [ [ 5 ], [ 6 ] ] ] ])).to.eql([ 1, 2, 3, 4, 5, 6 ]);
                     });
-                });
-            });
-        });
-    });
-
-    describe('virtual DOM', function () {
-        describe('constructing tree with', function () {
-            describe('empty node', function () {
-                xit('creates virtual DOM node', function () {});
-            });
-
-            describe('node with text attributes only', function () {
-                xit('creates virtual DOM node', function () {});
-            });
-
-            describe('node with event listeners only', function () {
-                xit('creates virtual DOM node', function () {});
-            });
-
-            describe('node with text only', function () {
-                xit('creates virtual DOM node', function () {});
-            });
-
-            describe('node with children only', function () {
-                xit('creates virtual DOM node tree', function () {});
-            });
-
-            describe('node with mixed parameters', function () {
-                xit('creates virtual DOM node tree', function () {});
-            });
-        });
-
-        describe('comparing', function () {
-            describe('two empty trees', function () {
-                xit('returns true', function () {});
-            });
-
-            describe('one empty and one non-empty trees', function () {
-                xit('returns false', function () {});
-            });
-
-            describe('equal trees', function () {
-                xit('returns true', function () {});
-            });
-
-            describe('non-equal trees', function () {
-                xit('returns false', function () {});
-            });
-        });
-
-        describe('updating', function () {
-            describe('empty tree', function () {
-                describe('to empty tree', function () {
-                    xit('does nothing', function () {});
-                });
-
-                describe('to non-empty tree', function () {
-                    xit('updates DOM tree', function () {});
-                });
-            });
-
-            describe('non-empty tree', function () {
-                describe('to update attributes', function () {
-                    xit('updates DOM', function () {});
-                });
-
-                describe('to update text', function () {
-                    xit('updates DOM', function () {});
-                });
-
-                describe('to remove children', function () {
-                    xit('updates DOM', function () {});
-                });
-
-                describe('to add children', function () {
-                    xit('updates DOM', function () {});
-                });
-
-                describe('to update children', function () {
-                    xit('updates DOM', function () {});
                 });
             });
         });
@@ -471,6 +329,86 @@ describe('libc', function () {
                     this.store.dispatch(this.message)
 
                     expect(this.handler).not.to.have.been.called();
+                });
+            });
+        });
+    });
+
+    describe('virtual DOM', function () {
+        describe('constructing tree with', function () {
+            describe('empty node', function () {
+                xit('creates virtual DOM node', function () {});
+            });
+
+            describe('node with text attributes only', function () {
+                xit('creates virtual DOM node', function () {});
+            });
+
+            describe('node with event listeners only', function () {
+                xit('creates virtual DOM node', function () {});
+            });
+
+            describe('node with text only', function () {
+                xit('creates virtual DOM node', function () {});
+            });
+
+            describe('node with children only', function () {
+                xit('creates virtual DOM node tree', function () {});
+            });
+
+            describe('node with mixed parameters', function () {
+                xit('creates virtual DOM node tree', function () {});
+            });
+        });
+
+        describe('comparing', function () {
+            describe('two empty trees', function () {
+                xit('returns true', function () {});
+            });
+
+            describe('one empty and one non-empty trees', function () {
+                xit('returns false', function () {});
+            });
+
+            describe('equal trees', function () {
+                xit('returns true', function () {});
+            });
+
+            describe('non-equal trees', function () {
+                xit('returns false', function () {});
+            });
+        });
+
+        describe('updating', function () {
+            describe('empty tree', function () {
+                describe('to empty tree', function () {
+                    xit('does nothing', function () {});
+                });
+
+                describe('to non-empty tree', function () {
+                    xit('updates DOM tree', function () {});
+                });
+            });
+
+            describe('non-empty tree', function () {
+                describe('to update attributes', function () {
+                    xit('updates DOM', function () {});
+                });
+
+                describe('to update text', function () {
+                    xit('updates DOM', function () {});
+                });
+
+                describe('to remove children', function () {
+                    xit('updates DOM', function () {});
+                });
+
+                describe('to add children', function () {
+                    xit('updates DOM', function () {});
+                });
+
+                describe('to update children', function () {
+                    xit('updates DOM', function () {});
                 });
             });
         });
