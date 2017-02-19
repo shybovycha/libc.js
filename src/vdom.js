@@ -3,12 +3,12 @@ import * as utils from './utils.js';
 export let isDOM = val => VirtualDOMNode.prototype.isPrototypeOf(val);
 
 export class VirtualDOMNode {
-    constructor(tagName, attributes, children, text) {
+    constructor(tagName) {
         this.tagName = tagName;
 
-        this.attributes = attributes || {};
-        this.children = children || [];
-        this.innerText = text || null;
+        this.attributes = {};
+        this.children = [];
+        this.innerText = null;
 
         this.parent = null;
 
