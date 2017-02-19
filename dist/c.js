@@ -1,4 +1,3 @@
-(function () {
 'use strict';
 
 let getType = val => Object.prototype.toString.call(val);
@@ -321,5 +320,3 @@ if (typeof window !== 'undefined') {
 } else if (typeof module === 'object' && module != null && module.exports) {
   module.exports = { c, createApplication };
 }
-
-}());

@@ -8,7 +8,7 @@ gulp.task('es6', function () {
     return gulp.src('src/**/*.js')
         .pipe(rollup({
             entry: 'src/c.js',
-            format: 'iife'
+            format: 'cjs'
         }))
         .pipe(gulp.dest('dist'));
 });
@@ -16,7 +16,8 @@ gulp.task('es6', function () {
 gulp.task('es6-min', ['es6'], function () {
     return gulp.src('dist/c.js')
         .pipe(babel({
-            presets: ['babili']
+            presets: ['babili'],
+            babelrc: false
         }))
         .pipe(rename('c.min.js'))
         .pipe(gulp.dest('dist'));
