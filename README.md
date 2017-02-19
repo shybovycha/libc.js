@@ -8,11 +8,17 @@ architectures and [http://mithril.js.org](Mithrill) library.
 
 Prior to building a library, you'll need to install development tools: `npm install`.
 
-To build libc use `npm run-script build`.
+To build libc with ES6 syntax use `npm run-script build`. To build one with ES5 syntax use `npm run-script build-es5`.
+
+## Test
+
+Tests reside in `test/` directory. There are both unit tests _(for utility functions and Store)_ and integration tests _(for application)_.
+
+To run tests use `npm run-script test`.
 
 ## Use
 
-First, include `c.js` file in your page:
+First, include `c.js` (or `c.min.js`) file in your page:
 
 ```html
     <script src="c.js"></script>
@@ -33,7 +39,7 @@ Application instance has two handy methods:
 
 Feel free to use the `Application.dispatch` method to set event listeners on the existing UI elements.
 
-## Example
+## Examples
 
 Note: more examples could be found in the `examples/` directory.
 
