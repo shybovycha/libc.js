@@ -64,6 +64,43 @@ let deepEqual = (obj1, obj2) => {
     return true;
 };
 
+class Store {
+    constructor(initialState) {
+        this.state = deepCopy(initialState);
+        this.listener = () => null;
+        this.reducer = (state, _) => state;
+    }
+
+    static createStore(initialState) {
+        return new Store(initialState);
+    }
+
+    getState() {
+        return deepCopy(this.state);
+    }
+
+    onAction(fn) {
+        this.reducer = fn;
+    }
+
+    onStateChanged(fn) {
+        this.listener = fn;
+    }
+
+    dispatch(action) {
+        setImmediate(_ => {
+            let oldState = deepCopy(this.state);
+            let newState = this.reducer(this.state, action);
+
+            if (deepEqual(newState, oldState))
+                return;
+
+            this.state = newState;
+            this.listener(newState, oldState);
+        });
+    }
+}
+
 let isDOM = val => VirtualDOMNode.prototype.isPrototypeOf(val);
 
 class VirtualDOMNode {
@@ -199,7 +236,7 @@ class VirtualDOMNode {
 }
 
 let c = function (tagName, _arg1, _arg2) {
-    let children, attrs, elt;
+    let children = [], attrs = {}, innerText = null;
 
     if (isArray(_arg1)) {
         children = _arg1.slice();
@@ -209,15 +246,12 @@ let c = function (tagName, _arg1, _arg2) {
         if (isArray(_arg2))
             children = _arg2.slice();
         else
-            children = [_arg2];
+            innerText = _arg2;
     } else {
-        children = [_arg1];
+        innerText = _arg1;
     }
 
-    children = children || [];
-    attrs = attrs || {};
-
-    elt = new VirtualDOMNode(tagName);
+    let elt = new VirtualDOMNode(tagName);
 
     Object.keys(attrs).forEach((attrName) => {
         let attrValue = attrs[attrName];
@@ -236,49 +270,14 @@ let c = function (tagName, _arg1, _arg2) {
         if (isDOM(child)) {
             elt.appendChild(child);
         } else {
-            elt.innerText = child;
+            elt.appendChild(c.apply(null, child));
         }
     });
 
+    elt.innerText = innerText;
+
     return elt;
 };
-
-class Store {
-    constructor(initialState) {
-        this.state = deepCopy(initialState);
-        this.listener = () => null;
-        this.reducer = (state, _) => state;
-    }
-
-    static createStore(initialState) {
-        return new Store(initialState);
-    }
-
-    getState() {
-        return deepCopy(this.state);
-    }
-
-    onAction(fn) {
-        this.reducer = fn;
-    }
-
-    onStateChanged(fn) {
-        this.listener = fn;
-    }
-
-    dispatch(action) {
-        setImmediate(_ => {
-            let oldState = deepCopy(this.state);
-            let newState = this.reducer(this.state, action);
-
-            if (deepEqual(newState, oldState))
-                return;
-
-            this.state = newState;
-            this.listener(newState, oldState);
-        });
-    }
-}
 
 class Application {
     constructor(initialState, updateFn, viewFn) {
@@ -294,7 +293,7 @@ class Application {
     }
 
     mount(placeholder) {
-        this.view = this.viewFn.call(null, this.store.getState(), this.dispatch.bind(this));
+        this.view = c.apply(null, this.viewFn.call(null, this.store.getState(), this.dispatch.bind(this)));
         this.view.materialize(placeholder);
     }
 
@@ -307,7 +306,7 @@ class Application {
     }
 
     _onStateChanged(state) {
-        let newView = this.viewFn.call(null, state, this.dispatch.bind(this));
+        let newView = c.apply(null, this.viewFn.call(null, state, this.dispatch.bind(this)));
         this.view.applyChanges(newView);
     }
 }
@@ -315,8 +314,7 @@ class Application {
 let createApplication = (initialState, updateFn, viewFn) => new Application(initialState, updateFn, viewFn);
 
 if (typeof window !== 'undefined') {
-  window.c = c;
   window.createApplication = createApplication;
 } else if (typeof module === 'object' && module != null && module.exports) {
-  module.exports = { c, createApplication };
+  module.exports = { createApplication };
 }

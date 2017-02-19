@@ -18,17 +18,17 @@ To run tests use `npm run-script test`.
 
 ## Use
 
-First, include `c.js` (or `c.min.js`) file in your page:
+First, include `libc.js` (or `libc.min.js`) file in your page:
 
 ```html
-    <script src="c.js"></script>
+    <script src="libc.js"></script>
 ```
 
 Then, define three entities:
 
 1. *Initial application state*, which is nothing but an object, containing application state
 2. *Reducer* or, in terms of Elm, `udpate :: State -> Message -> State` function, returning a new state, calculated on the current state and the incoming message (both passed as function parameters)
-3. *View* function, which is `view :: State -> DispatchFn -> Html` in terms of Elm; this function may use `c(tagName, [attributes], [children | text])` helper to generate the new version of an application UI; this new version will be used to **update** the existing UI (like with React - by using a very small changeset); the second argument for this function is a `dispatch(message)` function, which you may want to use to set event listeners to add some interaction to your app
+3. *View* function, which is `view :: State -> DispatchFn -> Html` in terms of Elm; this function should return an array in form of `[tagName, {attributes}, ([children] | text)]` to generate the new version of an application UI; this new version will be used to **update** the existing UI (like with React - by using a very small changeset); the second argument for this function is a `dispatch(message)` function, which you may want to use to set event listeners to add some interaction to your app
 
 Now, using the `createApplication :: State -> UpdateFn -> ViewFn -> Application` helper you may create an app instance.
 
@@ -59,11 +59,11 @@ function update(state, message) {
 };
 
 function view(state, dispatch) {
-  return c('div', [
-    c('button', { click: () => dispatch('INCREMENT') }, 'Increment'),
-    c('button', { click: () => dispatch('DECREMENT') }, 'Decrement'),
-    c('div', `Count: ${ state }`)
-  ]);
+  return ['div', [
+    ['button', { click: () => dispatch('INCREMENT') }, 'Increment'],
+    ['button', { click: () => dispatch('DECREMENT') }, 'Decrement'],
+    ['div', `Count: ${ state }`]
+  ]];
 };
 
 createApplication(initialState, update, view).mount(document.body);
@@ -84,13 +84,13 @@ let update = (state, message) => {
 };
 
 let view = (state, dispatch) => {
-  return c('div', [
-    c('div', [
-      c('input', { id: 'name', type: 'text' }),
-      c('button', { click: () => dispatch({ type: 'WELCOME', name: document.querySelector('#name').value }) }, 'welcome')
-    ]),
-    c('div', { style: `visibility: ${ state.name.length ? 'visible' : 'hidden' };` }, `Hello, ${ state.name }!`)
-  ]);
+  return ['div', [
+    ['div', [
+      ['input', { id: 'name', type: 'text' }],
+      ['button', { click: () => dispatch({ type: 'WELCOME', name: document.querySelector('#name').value }) }, 'welcome']
+    ],
+    ['div', { style: `visibility: ${ state.name.length ? 'visible' : 'hidden' };` }, `Hello, ${ state.name }!`]]
+  ]];
 };
 
 let app = createApplication(initialState, update, view);

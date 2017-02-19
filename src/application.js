@@ -1,4 +1,5 @@
 import { Store } from './store.js';
+import { c } from './vdom.js';
 
 export class Application {
     constructor(initialState, updateFn, viewFn) {
@@ -14,7 +15,7 @@ export class Application {
     }
 
     mount(placeholder) {
-        this.view = this.viewFn.call(null, this.store.getState(), this.dispatch.bind(this));
+        this.view = c.apply(null, this.viewFn.call(null, this.store.getState(), this.dispatch.bind(this)));
         this.view.materialize(placeholder);
     }
 
@@ -27,7 +28,7 @@ export class Application {
     }
 
     _onStateChanged(state) {
-        let newView = this.viewFn.call(null, state, this.dispatch.bind(this));
+        let newView = c.apply(null, this.viewFn.call(null, state, this.dispatch.bind(this)));
         this.view.applyChanges(newView);
     }
 }

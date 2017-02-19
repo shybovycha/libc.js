@@ -135,7 +135,7 @@ export class VirtualDOMNode {
 }
 
 export let c = function (tagName, _arg1, _arg2) {
-    let children, attrs, elt;
+    let children = [], attrs = {}, innerText = null;
 
     if (utils.isArray(_arg1)) {
         children = _arg1.slice();
@@ -145,15 +145,12 @@ export let c = function (tagName, _arg1, _arg2) {
         if (utils.isArray(_arg2))
             children = _arg2.slice();
         else
-            children = [_arg2];
+            innerText = _arg2;
     } else {
-        children = [_arg1];
+        innerText = _arg1;
     }
 
-    children = children || [];
-    attrs = attrs || {};
-
-    elt = new VirtualDOMNode(tagName);
+    let elt = new VirtualDOMNode(tagName);
 
     Object.keys(attrs).forEach((attrName) => {
         let attrValue = attrs[attrName];
@@ -172,9 +169,11 @@ export let c = function (tagName, _arg1, _arg2) {
         if (isDOM(child)) {
             elt.appendChild(child);
         } else {
-            elt.innerText = child;
+            elt.appendChild(c.apply(null, child));
         }
     });
+
+    elt.innerText = innerText;
 
     return elt;
 };

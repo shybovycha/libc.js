@@ -3,11 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title>libc counter example</title>
-  <script src="../dist/c.js"></script>
+  <script src="../dist/libc.js"></script>
 </head>
 <body>
-  <div id="app"></div>
-
   <script>
     var initialState = 0;
 
@@ -22,11 +20,11 @@
     };
 
     function view(state, dispatch) {
-      return c('div', [
-        c('button', { click: () => dispatch('INCREMENT') }, 'Increment'),
-        c('button', { click: () => dispatch('DECREMENT') }, 'Decrement'),
-        c('div', `Count: ${ state }`)
-      ]);
+      return ['div', [
+        ['button', { click: () => dispatch('INCREMENT') }, 'Increment'],
+        ['button', { click: () => dispatch('DECREMENT') }, 'Decrement'],
+        ['div', `Count: ${ state }`]
+      ]];
     };
 
     createApplication(initialState, update, view).mount(document.body);
