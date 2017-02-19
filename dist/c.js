@@ -67,12 +67,12 @@ let deepEqual = (obj1, obj2) => {
 let isDOM = val => VirtualDOMNode.prototype.isPrototypeOf(val);
 
 class VirtualDOMNode {
-    constructor(tagName, attributes, children, text) {
+    constructor(tagName) {
         this.tagName = tagName;
 
-        this.attributes = attributes || {};
-        this.children = children || [];
-        this.innerText = text || null;
+        this.attributes = {};
+        this.children = [];
+        this.innerText = null;
 
         this.parent = null;
 
