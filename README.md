@@ -77,7 +77,7 @@ function view(state, children, dispatch) {
   ]];
 };
 
-createComponent(view, update).call(null, initialState, null).mount(document.body);
+createComponent(view, update).init(initialState).mount(document.body);
 ```
 
 ### Welcome app
@@ -104,7 +104,7 @@ let view = (state, children, dispatch) => {
   ]];
 };
 
-let app = createApplication(view, update)(initialState);
+let app = createApplication(view, update).init(initialState);
 
 app.mount(document.body);
 ```
@@ -154,8 +154,6 @@ let Tabs = (function () {
 })();
 
 let app = (function () {
-    let update = (state, message) => state;
-
     let view = (state, children, dispatch) => {
         return [ Tabs, [
             ['div', [
@@ -173,8 +171,8 @@ let app = (function () {
         ] ];
     };
 
-    return createComponent(view, update);
+    return createComponent(view);
 })();
 
-app.call(null, null, null).mount(document.querySelector('#app'));
+app.init().mount(document.querySelector('#app'));
 ```
