@@ -21,7 +21,7 @@ To run tests use `npm run-script test`.
 First, include `libc.js` (or `libc.min.js`) file in your page:
 
 ```html
-    <script src="libc.js"></script>
+<script src="libc.js"></script>
 ```
 
 Then, define three entities:
@@ -158,15 +158,15 @@ let app = (function () {
         return [ Tabs, [
             ['div', [
                 ['div', { class: 'header' }, 'Tab #1'],
-                ['div', 'TAB NR1 CONTENT']
+                ['div', 'FIRST TAB CONTENT']
             ]],
             ['div', [
                 ['div', { class: 'header' }, 'Tab #2'],
-                ['div', 'TAB NR2 CONTENT']
+                ['div', 'SECOND TAB CONTENT']
             ]],
             ['div', [
-                ['div', { class: 'header' }, 'Tab #2'],
-                ['div', 'TAB NR3 CONTENT']
+                ['div', { class: 'header' }, 'Tab #3'],
+                ['div', 'THIRD TAB CONTENT']
             ]],
         ] ];
     };

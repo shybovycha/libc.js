@@ -91,8 +91,6 @@
         })();
 
         let app = (function () {
-            let update = (state, message) => state;
-
             let view = (state, children, dispatch) => {
                 return [ Tabs, [
                     ['div', [
@@ -110,7 +108,7 @@
                 ] ];
             };
 
-            return createComponent(view, update);
+            return createComponent(view);
         })();
 
         app.init().mount(document.querySelector('#app'));
