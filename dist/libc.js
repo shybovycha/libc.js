@@ -14,7 +14,19 @@ let isFunction = val => getType(val) === '[object Function]';
 
 let setImmediate = fn => setTimeout(fn, 0);
 
+let deepCopy = (val) => {
+    if (isArray(val))
+        return [].slice.call(val);
 
+    if (!isObject(val))
+        return val;
+
+    let ret = {};
+
+    Object.keys(val).forEach(k => ret[k] = deepCopy(val[k]));
+
+    return ret;
+};
 
 let deepEqual = (obj1, obj2) => {
     if ((obj1 === null && obj2 !== null) || (obj1 === null && obj2 !== null))
@@ -265,8 +277,46 @@ let c = function (_arg0, _arg1, _arg2) {
     return elt;
 };
 
+class Store {
+    constructor(initialState) {
+        this.state = deepCopy(initialState);
+        this.listener = () => null;
+        this.reducer = (state, _) => state;
+    }
+
+    static createStore(initialState) {
+        return new Store(initialState);
+    }
+
+    getState() {
+        return deepCopy(this.state);
+    }
+
+    onAction(fn) {
+        this.reducer = fn;
+    }
+
+    onStateChanged(fn) {
+        this.listener = fn;
+    }
+
+    dispatch(action) {
+        setImmediate(_ => {
+            let oldState = deepCopy(this.state);
+            let newState = this.reducer(this.state, action);
+
+            if (deepEqual(newState, oldState))
+                return;
+
+            this.state = newState;
+            this.listener(newState, oldState);
+        });
+    }
+}
+
 if (typeof window !== 'undefined') {
   window.createComponent = createComponent;
+  window.createStore = Store.createStore;
 } else if (typeof module === 'object' && module != null && module.exports) {
-  module.exports = { createComponent };
+  module.exports = { createComponent, createStore: Store.createStore };
 }
