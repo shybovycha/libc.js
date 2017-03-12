@@ -14,19 +14,7 @@ let isFunction = val => getType(val) === '[object Function]';
 
 let setImmediate = fn => setTimeout(fn, 0);
 
-let deepCopy = (val) => {
-    if (isArray(val))
-        return [].slice.call(val);
 
-    if (!isObject(val))
-        return val;
-
-    let ret = {};
-
-    Object.keys(val).forEach(k => ret[k] = deepCopy(val[k]));
-
-    return ret;
-};
 
 let deepEqual = (obj1, obj2) => {
     if ((obj1 === null && obj2 !== null) || (obj1 === null && obj2 !== null))
@@ -63,45 +51,6 @@ let deepEqual = (obj1, obj2) => {
 
     return true;
 };
-
-class Store {
-    constructor(initialState) {
-        this.state = deepCopy(initialState);
-        this.listener = () => null;
-        this.reducer = (state, _) => state;
-    }
-
-    static createStore(initialState) {
-        return new Store(initialState);
-    }
-
-    getState() {
-        return deepCopy(this.state);
-    }
-
-    onAction(fn) {
-        this.reducer = fn;
-    }
-
-    onStateChanged(fn) {
-        this.listener = fn;
-    }
-
-    dispatch(action) {
-        setImmediate(_ => {
-            let oldState = deepCopy(this.state);
-            let newState = this.reducer(this.state, action);
-
-            if (deepEqual(newState, oldState))
-                return;
-
-            this.state = newState;
-            this.listener(newState, oldState);
-        });
-    }
-}
-
-let isDOM = val => VirtualDOMNode.prototype.isPrototypeOf(val);
 
 class VirtualDOMNode {
     constructor(tagName) {
@@ -171,7 +120,7 @@ class VirtualDOMNode {
 
     applyChanges(elt2) {
         if (!this.elt) {
-            this.materialize();
+            this.mount();
         }
 
         let [children, attributes, text] = [elt2.children, elt2.attributes, elt2.innerText];
@@ -211,7 +160,7 @@ class VirtualDOMNode {
         }
     }
 
-    materialize(placeholder) {
+    mount(placeholder) {
         this.elt = document.createElement(this.tagName);
 
         if (typeof this.innerText !== 'undefined' && this.innerText !== null)
@@ -224,7 +173,7 @@ class VirtualDOMNode {
         });
 
         setImmediate(_ => {
-            this.children.forEach(child => child.materialize(this.elt));
+            this.children.forEach(child => child.mount(this.elt));
         });
 
         if (this.parent && this.parent.elt) {
@@ -235,8 +184,41 @@ class VirtualDOMNode {
     }
 }
 
-let c = function (tagName, _arg1, _arg2) {
-    let children = [], attrs = {}, innerText = null;
+function createComponent(viewFn, updateFn) {
+    let view = null, state = null, children = null;
+
+    let dispatch = function (message) {
+        let newState = updateFn.call(null, state, message);
+
+        if (deepEqual(newState, state))
+            return;
+
+        state = newState;
+
+        setImmediate(render);
+    };
+
+    let render = function () {
+        let newView = c.apply(null, viewFn.call(null, state, children, dispatch));
+
+        if (!view)
+            view = newView; else
+                view.applyChanges(newView);
+
+        return view;
+    };
+
+    return function (initialState, initialChildren) {
+        state = initialState;
+        children = (initialChildren || []).map(childParams => c.apply(null, childParams));
+        return render();
+    };
+}
+
+let isDOM$$1 = (_arg0) => VirtualDOMNode.prototype.isPrototypeOf(_arg0);
+
+let c = function (_arg0, _arg1, _arg2) {
+    let elt = null, children = [], attrs = {}, innerText = null;
 
     if (isArray(_arg1)) {
         children = _arg1.slice();
@@ -251,7 +233,11 @@ let c = function (tagName, _arg1, _arg2) {
         innerText = _arg1;
     }
 
-    let elt = new VirtualDOMNode(tagName);
+    if (isFunction(_arg0)) {
+        return _arg0.call(null, attrs, children || innerText);
+    } else {
+        elt = new VirtualDOMNode(_arg0);
+    }
 
     Object.keys(attrs).forEach((attrName) => {
         let attrValue = attrs[attrName];
@@ -267,7 +253,7 @@ let c = function (tagName, _arg1, _arg2) {
         if (typeof (child) === 'undefined' || child == null)
             return;
 
-        if (isDOM(child)) {
+        if (isDOM$$1(child)) {
             elt.appendChild(child);
         } else {
             elt.appendChild(c.apply(null, child));
@@ -279,42 +265,8 @@ let c = function (tagName, _arg1, _arg2) {
     return elt;
 };
 
-class Application {
-    constructor(initialState, updateFn, viewFn) {
-        this.store = new Store(initialState);
-
-        this.updateFn = updateFn;
-        this.viewFn = viewFn;
-
-        this.view = null;
-
-        this.store.onAction(this._onAction.bind(this));
-        this.store.onStateChanged(this._onStateChanged.bind(this));
-    }
-
-    mount(placeholder) {
-        this.view = c.apply(null, this.viewFn.call(null, this.store.getState(), this.dispatch.bind(this)));
-        this.view.materialize(placeholder);
-    }
-
-    dispatch(message) {
-        this.store.dispatch(message);
-    }
-
-    _onAction(state, message) {
-        return this.updateFn.call(null, state, message);
-    }
-
-    _onStateChanged(state) {
-        let newView = c.apply(null, this.viewFn.call(null, state, this.dispatch.bind(this)));
-        this.view.applyChanges(newView);
-    }
-}
-
-let createApplication = (initialState, updateFn, viewFn) => new Application(initialState, updateFn, viewFn);
-
 if (typeof window !== 'undefined') {
-  window.createApplication = createApplication;
+  window.createComponent = createComponent;
 } else if (typeof module === 'object' && module != null && module.exports) {
-  module.exports = { createApplication };
+  module.exports = { createComponent };
 }

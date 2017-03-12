@@ -70,7 +70,7 @@ export class VirtualDOMNode {
 
     applyChanges(elt2) {
         if (!this.elt) {
-            this.materialize();
+            this.mount();
         }
 
         let [children, attributes, text] = [elt2.children, elt2.attributes, elt2.innerText];
@@ -110,7 +110,7 @@ export class VirtualDOMNode {
         }
     }
 
-    materialize(placeholder) {
+    mount(placeholder) {
         this.elt = document.createElement(this.tagName);
 
         if (typeof this.innerText !== 'undefined' && this.innerText !== null)
@@ -123,7 +123,7 @@ export class VirtualDOMNode {
         });
 
         utils.setImmediate(_ => {
-            this.children.forEach(child => child.materialize(this.elt))
+            this.children.forEach(child => child.mount(this.elt))
         });
 
         if (this.parent && this.parent.elt) {
@@ -133,47 +133,3 @@ export class VirtualDOMNode {
         }
     }
 }
-
-export let c = function (tagName, _arg1, _arg2) {
-    let children = [], attrs = {}, innerText = null;
-
-    if (utils.isArray(_arg1)) {
-        children = _arg1.slice();
-    } else if (utils.isObject(_arg1)) {
-        attrs = _arg1;
-
-        if (utils.isArray(_arg2))
-            children = _arg2.slice();
-        else
-            innerText = _arg2;
-    } else {
-        innerText = _arg1;
-    }
-
-    let elt = new VirtualDOMNode(tagName);
-
-    Object.keys(attrs).forEach((attrName) => {
-        let attrValue = attrs[attrName];
-
-        if (utils.isFunction(attrValue)) {
-            elt.addEventListener(attrName, attrValue);
-        } else {
-            elt.setAttribute(attrName, attrValue);
-        }
-    });
-
-    children.forEach((child) => {
-        if (typeof (child) === 'undefined' || child == null)
-            return;
-
-        if (isDOM(child)) {
-            elt.appendChild(child);
-        } else {
-            elt.appendChild(c.apply(null, child));
-        }
-    });
-
-    elt.innerText = innerText;
-
-    return elt;
-};

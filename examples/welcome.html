@@ -20,7 +20,7 @@
       return state;
     };
 
-    let view = (state, dispatch) => {
+    let view = (state, children, dispatch) => {
       return ['div', [
         ['div', [
           ['input', { id: 'name', type: 'text' }],
@@ -30,7 +30,7 @@
       ]];
     };
 
-    let app = createApplication(initialState, update, view);
+    let app = createComponent(view, update)(initialState);
 
     app.mount(document.querySelector('#app'));
   </script>

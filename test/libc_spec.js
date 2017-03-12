@@ -7,7 +7,6 @@ var expect = chai.expect;
 var utils = require('../src/utils.js');
 var vdom = require('../src/vdom.js');
 var Store = require('../src/store.js').Store;
-var application = require('../src/application.js');
 
 // do not run functions in the EventLoop in tests
 utils.setImmediate = function (fn) { fn(); };

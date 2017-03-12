@@ -1,7 +1,7 @@
-import { createApplication } from './application.js';
+import { createComponent } from './component.js';
 
 if (typeof window !== 'undefined') {
-  window.createApplication = createApplication;
+  window.createComponent = createComponent;
 } else if (typeof module === 'object' && module != null && module.exports) {
-  module.exports = { createApplication };
+  module.exports = { createComponent };
 }

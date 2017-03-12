@@ -26,18 +26,24 @@ First, include `libc.js` (or `libc.min.js`) file in your page:
 
 Then, define three entities:
 
-1. *Initial application state*, which is nothing but an object, containing application state
+1. *Initial component state*, which is nothing but an object, containing component state
 2. *Reducer* or, in terms of Elm, `udpate :: State -> Message -> State` function, returning a new state, calculated on the current state and the incoming message (both passed as function parameters)
-3. *View* function, which is `view :: State -> DispatchFn -> Html` in terms of Elm; this function should return an array in form of `[tagName, {attributes}, ([children] | text)]` to generate the new version of an application UI; this new version will be used to **update** the existing UI (like with React - by using a very small changeset); the second argument for this function is a `dispatch(message)` function, which you may want to use to set event listeners to add some interaction to your app
+3. *View* function, which is `view :: State -> Children -> DispatchFn -> VirtualDOMNode` in terms of Elm; this function should return an array in form of `[(tagName | ComponentFn), {attributes}, ([children] | text)]` to generate the new version of an component UI; this new version will be used to **update** the existing UI (like with React - by using a very small changeset); the second argument for this function is a `dispatch(message)` function, which you may want to use to set event listeners to add some interaction to your component
 
-Now, using the `createApplication :: State -> UpdateFn -> ViewFn -> Application` helper you may create an app instance.
+Now, using the `createComponent :: State -> ViewFn -> UpdateFn -> ComponentFn` helper you may create a component.
 
-Application instance has two handy methods:
+Component is a factory function, which can be used later in other components. It has a signature of `ComponentFn :: State -> Children -> VirtualDOMNode`. `VirtualDOMNode`, returned by component factory function call, is just as a usual DOM node, except it is handled by JavaScript prior to the browser. It has a set of methods, similar to `DOMNode`:
 
-1. `mount(HTMLElement)`, which materializes the application (attaches application view' DOM tree to the `placeholder` node)
-2. `dispatch(message)`, which sends a message to the `update(...)` function, so you could communicate with your app
-
-Feel free to use the `Application.dispatch` method to set event listeners on the existing UI elements.
+1. `mount(HTMLElement)`, which mounts the application (attaches application view' DOM tree to the `placeholder` node)
+2. `addEventListener(eventName, eventHandler)`
+3. `removeEventListener(eventName, eventHandler)`
+4. `dispatchEvent(eventObject)`
+5. `appendChild(VirtualDOMNode)`
+6. `removeChild(VirtualDOMNode)`
+7. `getAttribute(attrName)`
+8. `setAttribute(attrName, attrValue)`
+9. `equal(VirtualDOMNode)` - compares this node to the given one
+10. `applyChanges(VirtualDOMNode)` - finds the differences between this VirtualDOMNode and the given one and applies them on this node
 
 ## Examples
 
@@ -58,7 +64,7 @@ function update(state, message) {
   return state;
 };
 
-function view(state, dispatch) {
+function view(state, children, dispatch) {
   return ['div', [
     ['button', { click: () => dispatch('INCREMENT') }, 'Increment'],
     ['button', { click: () => dispatch('DECREMENT') }, 'Decrement'],
@@ -66,7 +72,7 @@ function view(state, dispatch) {
   ]];
 };
 
-createApplication(initialState, update, view).mount(document.body);
+createComponent(view, update).call(null, initialState, null).mount(document.body);
 ```
 
 ### Welcome app
@@ -83,7 +89,7 @@ let update = (state, message) => {
   return state;
 };
 
-let view = (state, dispatch) => {
+let view = (state, children, dispatch) => {
   return ['div', [
     ['div', [
       ['input', { id: 'name', type: 'text' }],
@@ -93,7 +99,77 @@ let view = (state, dispatch) => {
   ]];
 };
 
-let app = createApplication(initialState, update, view);
+let app = createApplication(view, update)(initialState);
 
 app.mount(document.body);
+```
+
+### Tabs widget
+
+```js
+let Tabs = (function () {
+    let update = (state, message) => {
+        if (message.type == 'SELECT_TAB')
+            return Object.assign({}, state, {
+                currentTabIndex: message.tabIndex
+            });
+
+        return state;
+    };
+
+    let view = (state, children, dispatch) => {
+        let currentTabIndex = state.currentTabIndex || 0;
+
+        let tabHeaders = children.map((tab, tabIndex) => {
+            return [ 'div', {
+                    class: `tab-header ${tabIndex == currentTabIndex ? 'selected' : ''}`,
+                    click: () => dispatch({
+                        type: 'SELECT_TAB',
+                        tabIndex
+                    })
+                },
+                [ tab.children[0] ]
+            ];
+        });
+
+        let tabs = children.map((tab, tabIndex) => {
+            return [ 'div',
+                { class: `tab-content ${tabIndex == currentTabIndex ? 'selected' : ''}` },
+                tab.children.slice(1)
+            ];
+        });
+
+        return [ 'div', [
+            [ 'div', { class: 'tab-headers' }, tabHeaders ],
+            [ 'div', { class: 'tab-container' }, tabs ]
+        ]];
+    };
+
+    return createComponent(view, update);
+})();
+
+let app = (function () {
+    let update = (state, message) => state;
+
+    let view = (state, children, dispatch) => {
+        return [ Tabs, [
+            ['div', [
+                ['div', { class: 'header' }, 'Tab #1'],
+                ['div', 'TAB NR1 CONTENT']
+            ]],
+            ['div', [
+                ['div', { class: 'header' }, 'Tab #2'],
+                ['div', 'TAB NR2 CONTENT']
+            ]],
+            ['div', [
+                ['div', { class: 'header' }, 'Tab #2'],
+                ['div', 'TAB NR3 CONTENT']
+            ]],
+        ] ];
+    };
+
+    return createComponent(view, update);
+})();
+
+app.call(null, null, null).mount(document.querySelector('#app'));
 ```

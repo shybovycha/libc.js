@@ -19,7 +19,7 @@
       return state;
     };
 
-    function view(state, dispatch) {
+    function view(state, children, dispatch) {
       return ['div', [
         ['button', { click: () => dispatch('INCREMENT') }, 'Increment'],
         ['button', { click: () => dispatch('DECREMENT') }, 'Decrement'],
@@ -27,7 +27,7 @@
       ]];
     };
 
-    createApplication(initialState, update, view).mount(document.body);
+    createComponent(view, update).call(null, initialState, null).mount(document.body);
   </script>
 </body>
 </html>

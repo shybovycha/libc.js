@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>libc welcome example</title>
+    <script src="../dist/libc.js"></script>
+
+    <style>
+        .tab-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tab-headers {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .tab-header {
+            text-align: center;
+            cursor: pointer;
+            flex-grow: 1;
+        }
+
+        .tab-header.selected {
+            background: #ddd;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.selected {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app"></div>
+
+    <script>
+        let Tabs = (function () {
+            let update = (state, message) => {
+                if (message.type == 'SELECT_TAB')
+                    return Object.assign({}, state, {
+                        currentTabIndex: message.tabIndex
+                    });
+
+                return state;
+            };
+
+            let view = (state, children, dispatch) => {
+                let currentTabIndex = state.currentTabIndex || 0;
+
+                let tabHeaders = children.map((tab, tabIndex) => {
+                    return [ 'div', {
+                            class: `tab-header ${tabIndex == currentTabIndex ? 'selected' : ''}`,
+                            click: () => dispatch({
+                                type: 'SELECT_TAB',
+                                tabIndex
+                            })
+                        },
+                        [ tab.children[0] ]
+                    ];
+                });
+
+                let tabs = children.map((tab, tabIndex) => {
+                    return [ 'div',
+                        { class: `tab-content ${tabIndex == currentTabIndex ? 'selected' : ''}` },
+                        tab.children.slice(1)
+                    ];
+                });
+
+                return [ 'div', [
+                    [ 'div', { class: 'tab-headers' }, tabHeaders ],
+                    [ 'div', { class: 'tab-container' }, tabs ]
+                ]];
+            };
+
+            return createComponent(view, update);
+        })();
+
+        let app = (function () {
+            let update = (state, message) => state;
+
+            let view = (state, children, dispatch) => {
+                return [ Tabs, [
+                    ['div', [
+                        ['div', { class: 'header' }, 'Tab #1'],
+                        ['div', 'TAB NR1 CONTENT']
+                    ]],
+                    ['div', [
+                        ['div', { class: 'header' }, 'Tab #2'],
+                        ['div', 'TAB NR2 CONTENT']
+                    ]],
+                    ['div', [
+                        ['div', { class: 'header' }, 'Tab #2'],
+                        ['div', 'TAB NR3 CONTENT']
+                    ]],
+                ] ];
+            };
+
+            return createComponent(view, update);
+        })();
+
+        app.call(null, null, null).mount(document.querySelector('#app'));
+    </script>
+</body>
+
+</html>
