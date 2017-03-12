@@ -208,18 +208,18 @@ class Component {
     }
 
     dispatch(message) {
-        let newState = this.updateFn.call(null, state, message);
+        let newState = this.updateFn.call(null, this.state, message);
 
-        if (deepEqual(newState, state))
+        if (deepEqual(newState, this.state))
             return;
 
         this.state = newState;
 
-        setImmediate(this.render);
+        setImmediate(this.render.bind(this));
     }
 
     render() {
-        let newView = c.apply(null, this.viewFn.call(null, this.state, this.children, this.dispatch));
+        let newView = c.apply(null, this.viewFn.call(null, this.state, this.children, this.dispatch.bind(this)));
 
         if (!this.view)
             this.view = newView; else
@@ -257,7 +257,7 @@ let c = function (_arg0, _arg1, _arg2) {
     }
 
     if (Component.prototype.isPrototypeOf(_arg0)) {
-        return _arg0.init(attrs, children || innerText);
+        return _arg0.init(attrs, children.map(child => isDOM$$1(child) ? child : c.apply(null, child)) || innerText);
     } else {
         elt = new VirtualDOMNode(_arg0);
     }
