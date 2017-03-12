@@ -3,8 +3,8 @@ import * as utils from './utils.js';
 export class Store {
     constructor(initialState) {
         this.state = utils.deepCopy(initialState);
-        this.listener = () => null;
-        this.reducer = (state, _) => state;
+        this.listeners = [];
+        this.reducers = [];
     }
 
     static createStore(initialState) {
@@ -16,23 +16,23 @@ export class Store {
     }
 
     onAction(fn) {
-        this.reducer = fn;
+        this.reducers.push(fn);
     }
 
     onStateChanged(fn) {
-        this.listener = fn;
+        this.listeners.push(fn);
     }
 
     dispatch(action) {
         utils.setImmediate(_ => {
             let oldState = utils.deepCopy(this.state);
-            let newState = this.reducer(this.state, action);
+            let newState = this.reducers.reduce((acc, fn) => fn.call(null, acc, action), this.state);
 
             if (utils.deepEqual(newState, oldState))
                 return;
 
             this.state = newState;
-            this.listener(newState, oldState);
+            this.listeners.forEach(fn => fn.call(null, newState, oldState));
         });
     }
 }

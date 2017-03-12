@@ -2,36 +2,46 @@ import { VirtualDOMNode } from './vdom.js';
 
 import * as utils from './utils.js';
 
-export function createComponent(viewFn, updateFn) {
-    let view = null, state = null, children = null;
+export class Component {
+    constructor(viewFn, updateFn) {
+        this.viewFn = viewFn;
+        this.updateFn = updateFn;
 
-    let dispatch = function (message) {
-        let newState = updateFn.call(null, state, message);
+        this.view = null;
+        this.state = null;
+        this.children = null;
+    }
+
+    dispatch(message) {
+        let newState = this.updateFn.call(null, state, message);
 
         if (utils.deepEqual(newState, state))
             return;
 
-        state = newState;
+        this.state = newState;
 
-        utils.setImmediate(render);
-    };
+        utils.setImmediate(this.render);
+    }
 
-    let render = function () {
-        let newView = c.apply(null, viewFn.call(null, state, children, dispatch));
+    render() {
+        let newView = c.apply(null, this.viewFn.call(null, this.state, this.children, this.dispatch));
 
-        if (!view)
-            view = newView; else
-                view.applyChanges(newView);
+        if (!this.view)
+            this.view = newView; else
+                this.view.applyChanges(newView);
 
-        return view;
-    };
+        return this.view;
+    }
 
-    return function (initialState, initialChildren) {
-        state = initialState;
-        children = (initialChildren || []).map(childParams => c.apply(null, childParams));
-        return render();
-    };
+    init(state, children) {
+        this.state = state;
+        this.children = children;
+
+        return this.render();
+    }
 };
+
+export let createComponent = (viewFn, updateFn) => new Component(viewFn, updateFn || ((state, message) => state));
 
 export let isDOM = (_arg0) => VirtualDOMNode.prototype.isPrototypeOf(_arg0);
 
@@ -51,8 +61,8 @@ export let c = function (_arg0, _arg1, _arg2) {
         innerText = _arg1;
     }
 
-    if (utils.isFunction(_arg0)) {
-        return _arg0.call(null, attrs, children || innerText);
+    if (Component.prototype.isPrototypeOf(_arg0)) {
+        return _arg0.init(attrs, children || innerText);
     } else {
         elt = new VirtualDOMNode(_arg0);
     }

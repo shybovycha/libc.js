@@ -30,7 +30,7 @@
       ]];
     };
 
-    let app = createComponent(view, update)(initialState);
+    let app = createComponent(view, update).init(initialState);
 
     app.mount(document.querySelector('#app'));
   </script>

@@ -23,7 +23,8 @@ export class VirtualDOMNode {
     }
 
     setAttribute(attr, val) {
-        this.attributes[attr] = val;
+        if (!!val)
+            this.attributes[attr] = val;
     }
 
     getAttribute(attr) {

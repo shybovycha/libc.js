@@ -85,7 +85,8 @@ class VirtualDOMNode {
     }
 
     setAttribute(attr, val) {
-        this.attributes[attr] = val;
+        if (!!val)
+            this.attributes[attr] = val;
     }
 
     getAttribute(attr) {
@@ -196,36 +197,46 @@ class VirtualDOMNode {
     }
 }
 
-function createComponent(viewFn, updateFn) {
-    let view = null, state = null, children = null;
+class Component {
+    constructor(viewFn, updateFn) {
+        this.viewFn = viewFn;
+        this.updateFn = updateFn;
 
-    let dispatch = function (message) {
-        let newState = updateFn.call(null, state, message);
+        this.view = null;
+        this.state = null;
+        this.children = null;
+    }
+
+    dispatch(message) {
+        let newState = this.updateFn.call(null, state, message);
 
         if (deepEqual(newState, state))
             return;
 
-        state = newState;
+        this.state = newState;
 
-        setImmediate(render);
-    };
+        setImmediate(this.render);
+    }
 
-    let render = function () {
-        let newView = c.apply(null, viewFn.call(null, state, children, dispatch));
+    render() {
+        let newView = c.apply(null, this.viewFn.call(null, this.state, this.children, this.dispatch));
 
-        if (!view)
-            view = newView; else
-                view.applyChanges(newView);
+        if (!this.view)
+            this.view = newView; else
+                this.view.applyChanges(newView);
 
-        return view;
-    };
+        return this.view;
+    }
 
-    return function (initialState, initialChildren) {
-        state = initialState;
-        children = (initialChildren || []).map(childParams => c.apply(null, childParams));
-        return render();
-    };
+    init(state, children) {
+        this.state = state;
+        this.children = children;
+
+        return this.render();
+    }
 }
+
+let createComponent = (viewFn, updateFn) => new Component(viewFn, updateFn || ((state, message) => state));
 
 let isDOM$$1 = (_arg0) => VirtualDOMNode.prototype.isPrototypeOf(_arg0);
 
@@ -245,8 +256,8 @@ let c = function (_arg0, _arg1, _arg2) {
         innerText = _arg1;
     }
 
-    if (isFunction(_arg0)) {
-        return _arg0.call(null, attrs, children || innerText);
+    if (Component.prototype.isPrototypeOf(_arg0)) {
+        return _arg0.init(attrs, children || innerText);
     } else {
         elt = new VirtualDOMNode(_arg0);
     }
@@ -280,8 +291,8 @@ let c = function (_arg0, _arg1, _arg2) {
 class Store {
     constructor(initialState) {
         this.state = deepCopy(initialState);
-        this.listener = () => null;
-        this.reducer = (state, _) => state;
+        this.listeners = [];
+        this.reducers = [];
     }
 
     static createStore(initialState) {
@@ -293,23 +304,23 @@ class Store {
     }
 
     onAction(fn) {
-        this.reducer = fn;
+        this.reducers.push(fn);
     }
 
     onStateChanged(fn) {
-        this.listener = fn;
+        this.listeners.push(fn);
     }
 
     dispatch(action) {
         setImmediate(_ => {
             let oldState = deepCopy(this.state);
-            let newState = this.reducer(this.state, action);
+            let newState = this.reducers.reduce((acc, fn) => fn.call(null, acc, action), this.state);
 
             if (deepEqual(newState, oldState))
                 return;
 
             this.state = newState;
-            this.listener(newState, oldState);
+            this.listeners.forEach(fn => fn.call(null, newState, oldState));
         });
     }
 }
