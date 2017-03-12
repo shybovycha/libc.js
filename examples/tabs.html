@@ -23,6 +23,14 @@
             flex-grow: 1;
         }
 
+        .tab-header:hover {
+            text-decoration: underline;
+        }
+
+        .tab-header.selected:hover {
+            text-decoration: none;
+        }
+
         .tab-header.selected {
             background: #ddd;
         }
@@ -89,15 +97,15 @@
                 return [ Tabs, [
                     ['div', [
                         ['div', { class: 'header' }, 'Tab #1'],
-                        ['div', 'TAB NR1 CONTENT']
+                        ['div', 'FIRST TAB CONTENT']
                     ]],
                     ['div', [
                         ['div', { class: 'header' }, 'Tab #2'],
-                        ['div', 'TAB NR2 CONTENT']
+                        ['div', 'SECOND TAB CONTENT']
                     ]],
                     ['div', [
                         ['div', { class: 'header' }, 'Tab #3'],
-                        ['div', 'TAB NR3 CONTENT']
+                        ['div', 'THIRD TAB CONTENT']
                     ]],
                 ] ];
             };
