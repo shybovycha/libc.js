@@ -1,8 +1,8 @@
 # libc
 
 `libc` is a javascript framework which allows to create fast and robust applications.
-It has been highly inspired by [http://redux.js.org/](Redux) and [http://elm-lang.org](Elm)
-architectures and [http://mithril.js.org](Mithrill) library.
+It has been highly inspired by [Redux](http://redux.js.org/) and [Elm](http://elm-lang.org)
+architectures and [Mithrill](http://mithril.js.org) library.
 
 ## Build
 
@@ -52,4 +52,4 @@ Now, using the `createComponent :: State -> ViewFn -> UpdateFn -> Component` hel
 
 ## Examples
 
-All the examples could be found in the (https://github.com/shybovycha/libc.js/tree/master/examples)[`examples/`] directory.
+All the examples could be found in the [`examples/`](https://github.com/shybovycha/libc.js/tree/master/examples) directory.
