@@ -65,11 +65,7 @@
                 ]];
             };
 
-            let component = createComponent(view);
-
-            store.onStateChanged(() => component.render());
-
-            return component;
+            return createComponent(view);
         })(cartStore);
 
         let ProductList = (function (store) {
@@ -96,14 +92,11 @@
                 return [ 'div', { class: 'product-list' }, products ];
             };
 
-            let component = createComponent(view);
-
-            store.onStateChanged(() => component.render());
-
-            return component;
+            return createComponent(view);
         })(cartStore);
 
-        let app = (function () {
+
+        let App = (function () {
             let view = (state, children, dispatch) => {
                 return [ 'div', [
                     [ Cart ],
@@ -114,7 +107,9 @@
             return createComponent(view);
         })();
 
-        app.init().mount(document.querySelector('#app'));
+        let app = App.init().mount(document.querySelector('#app'));
+
+        cartStore.onStateChanged(() => app.render());
     </script>
 </body>
 

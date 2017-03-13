@@ -7,27 +7,35 @@
 </head>
 <body>
   <script>
-    var initialState = 0;
+    var counterStore = createStore(0);
 
     function update(state, message) {
-      if (message == 'INCREMENT')
+        if (message == 'INCREMENT')
         return state + 1;
 
-      if (message == 'DECREMENT')
+        if (message == 'DECREMENT')
         return state - 1;
 
-      return state;
-    };
+        return state;
+    }
 
-    function view(state, children, dispatch) {
-      return ['div', [
-        ['button', { click: () => dispatch('INCREMENT') }, 'Increment'],
-        ['button', { click: () => dispatch('DECREMENT') }, 'Decrement'],
-        ['div', `Count: ${ state }`]
-      ]];
-    };
+    counterStore.onAction(update);
 
-    createComponent(view, update).init(initialState).mount(document.body);
+    function view(state) {
+        let store = state.store;
+
+        return ['div', [
+            ['button', { click: () => store.dispatch('INCREMENT') }, 'Increment'],
+            ['button', { click: () => store.dispatch('DECREMENT') }, 'Decrement'],
+            ['div', `Count: ${ store.getState() }`]
+        ]];
+    }
+
+    var counter = createComponent(view).init({ store: counterStore });
+
+    counter.mount(document.body);
+
+    counterStore.onStateChanged(() => { debugger; counter.render() });
   </script>
 </body>
 </html>

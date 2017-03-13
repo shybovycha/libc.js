@@ -37,11 +37,28 @@ export class Component {
         this.state = state;
         this.children = children;
 
-        return this.render();
+        return this;
+    }
+
+    mount(placeholder) {
+        this.render().mount(placeholder);
+        return this;
     }
 };
 
-export let createComponent = (viewFn, updateFn) => new Component(viewFn, updateFn || ((state, message) => state));
+export class ComponentFactory {
+    constructor(viewFn, updateFn) {
+        this.viewFn = viewFn;
+        this.updateFn = updateFn;
+    }
+
+    init(state, children) {
+        let component = new Component(this.viewFn, this.updateFn);
+        return component.init(state, children);
+    }
+};
+
+export let createComponent = (viewFn, updateFn) => new ComponentFactory(viewFn, updateFn || ((state, message) => state));
 
 export let isDOM = (_arg0) => VirtualDOMNode.prototype.isPrototypeOf(_arg0);
 
@@ -61,8 +78,8 @@ export let c = function (_arg0, _arg1, _arg2) {
         innerText = _arg1;
     }
 
-    if (Component.prototype.isPrototypeOf(_arg0)) {
-        return _arg0.init(attrs, children.map(child => isDOM(child) ? child : c.apply(null, child)) || innerText);
+    if (ComponentFactory.prototype.isPrototypeOf(_arg0) || Component.prototype.isPrototypeOf(_arg0)) {
+        return _arg0.init(attrs, children.map(child => isDOM(child) ? child : c.apply(null, child)) || innerText).render();
     } else {
         elt = new VirtualDOMNode(_arg0);
     }
