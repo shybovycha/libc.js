@@ -197,7 +197,7 @@ class VirtualDOMNode {
     }
 }
 
-class Component {
+class ComponentInstance {
     constructor(viewFn, updateFn) {
         this.viewFn = viewFn;
         this.updateFn = updateFn;
@@ -219,7 +219,7 @@ class Component {
     }
 
     render() {
-        let newView = c.apply(null, this.viewFn.call(null, this.state, this.children, this.dispatch.bind(this)));
+        let newView = this.viewFn.call(null, this.state, this.children, this.dispatch.bind(this));
 
         if (!this.view)
             this.view = newView; else
@@ -248,7 +248,7 @@ class ComponentFactory {
     }
 
     init(state, children) {
-        let component = new Component(this.viewFn, this.updateFn);
+        let component = new ComponentInstance(this.viewFn, this.updateFn);
         return component.init(state, children);
     }
 }
@@ -273,11 +273,11 @@ let c = function (_arg0, _arg1, _arg2) {
         innerText = _arg1;
     }
 
-    if (ComponentFactory.prototype.isPrototypeOf(_arg0) || Component.prototype.isPrototypeOf(_arg0)) {
-        return _arg0.init(attrs, children.map(child => isDOM$$1(child) ? child : c.apply(null, child)) || innerText).render();
-    } else {
-        elt = new VirtualDOMNode(_arg0);
+    if (ComponentFactory.prototype.isPrototypeOf(_arg0)) {
+        return _arg0.init(attrs, children || innerText);
     }
+
+    elt = new VirtualDOMNode(_arg0);
 
     Object.keys(attrs).forEach((attrName) => {
         let attrValue = attrs[attrName];
@@ -296,7 +296,7 @@ let c = function (_arg0, _arg1, _arg2) {
         if (isDOM$$1(child)) {
             elt.appendChild(child);
         } else {
-            elt.appendChild(c.apply(null, child));
+            elt.appendChild(child.render());
         }
     });
 
@@ -345,6 +345,7 @@ class Store {
 if (typeof window !== 'undefined') {
   window.createComponent = createComponent;
   window.createStore = Store.createStore;
+  window.c = c;
 } else if (typeof module === 'object' && module != null && module.exports) {
-  module.exports = { createComponent, createStore: Store.createStore };
+  module.exports = { createComponent, createStore: Store.createStore, c };
 }

@@ -2,7 +2,7 @@ import { VirtualDOMNode } from './vdom.js';
 
 import * as utils from './utils.js';
 
-export class Component {
+export class ComponentInstance {
     constructor(viewFn, updateFn) {
         this.viewFn = viewFn;
         this.updateFn = updateFn;
@@ -24,7 +24,7 @@ export class Component {
     }
 
     render() {
-        let newView = c.apply(null, this.viewFn.call(null, this.state, this.children, this.dispatch.bind(this)));
+        let newView = this.viewFn.call(null, this.state, this.children, this.dispatch.bind(this));
 
         if (!this.view)
             this.view = newView; else
@@ -53,7 +53,7 @@ export class ComponentFactory {
     }
 
     init(state, children) {
-        let component = new Component(this.viewFn, this.updateFn);
+        let component = new ComponentInstance(this.viewFn, this.updateFn);
         return component.init(state, children);
     }
 };
@@ -78,11 +78,11 @@ export let c = function (_arg0, _arg1, _arg2) {
         innerText = _arg1;
     }
 
-    if (ComponentFactory.prototype.isPrototypeOf(_arg0) || Component.prototype.isPrototypeOf(_arg0)) {
-        return _arg0.init(attrs, children.map(child => isDOM(child) ? child : c.apply(null, child)) || innerText).render();
-    } else {
-        elt = new VirtualDOMNode(_arg0);
+    if (ComponentFactory.prototype.isPrototypeOf(_arg0)) {
+        return _arg0.init(attrs, children || innerText);
     }
+
+    elt = new VirtualDOMNode(_arg0);
 
     Object.keys(attrs).forEach((attrName) => {
         let attrValue = attrs[attrName];
@@ -101,7 +101,7 @@ export let c = function (_arg0, _arg1, _arg2) {
         if (isDOM(child)) {
             elt.appendChild(child);
         } else {
-            elt.appendChild(c.apply(null, child));
+            elt.appendChild(child.render());
         }
     });
 

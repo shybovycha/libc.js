@@ -63,7 +63,7 @@
                 let currentTabIndex = state.currentTabIndex || 0;
 
                 let tabHeaders = children.map((tab, tabIndex) => {
-                    return [ 'div', {
+                    return c('div', {
                             class: `tab-header ${tabIndex == currentTabIndex ? 'selected' : ''}`,
                             click: () => dispatch({
                                 type: 'SELECT_TAB',
@@ -71,20 +71,20 @@
                             })
                         },
                         [ tab.children[0] ]
-                    ];
+                    );
                 });
 
                 let tabs = children.map((tab, tabIndex) => {
-                    return [ 'div',
+                    return c('div',
                         { class: `tab-content ${tabIndex == currentTabIndex ? 'selected' : ''}` },
                         tab.children.slice(1)
-                    ];
+                    );
                 });
 
-                return [ 'div', [
-                    [ 'div', { class: 'tab-headers' }, tabHeaders ],
-                    [ 'div', { class: 'tab-container' }, tabs ]
-                ]];
+                return c('div', [
+                    c('div', { class: 'tab-headers' }, tabHeaders),
+                    c('div', { class: 'tab-container' }, tabs)
+                ]);
             };
 
             return createComponent(view, update);
@@ -92,26 +92,26 @@
 
         let app = (function () {
             let view = (state, children, dispatch) => {
-                return [ Tabs, [
-                    ['div', [
-                        ['div', { class: 'header' }, 'Tab #1'],
-                        ['div', 'FIRST TAB CONTENT']
-                    ]],
-                    ['div', [
-                        ['div', { class: 'header' }, 'Tab #2'],
-                        ['div', 'SECOND TAB CONTENT']
-                    ]],
-                    ['div', [
-                        ['div', { class: 'header' }, 'Tab #3'],
-                        ['div', 'THIRD TAB CONTENT']
-                    ]],
-                ] ];
+                return c(Tabs, [
+                    c('div', [
+                        c('div', { class: 'header' }, 'Tab #1'),
+                        c('div', 'FIRST TAB CONTENT')
+                    ]),
+                    c('div', [
+                        c('div', { class: 'header' }, 'Tab #2'),
+                        c('div', 'SECOND TAB CONTENT')
+                    ]),
+                    c('div', [
+                        c('div', { class: 'header' }, 'Tab #3'),
+                        c('div', 'THIRD TAB CONTENT')
+                    ]),
+                ] );
             };
 
             return createComponent(view);
         })();
 
-        app.init().mount(document.querySelector('#app'));
+        c(app).mount(document.querySelector('#app'));
     </script>
 </body>
 

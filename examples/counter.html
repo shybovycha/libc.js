@@ -22,20 +22,20 @@
     counterStore.onAction(update);
 
     function view(state) {
-        let store = state.store;
+        let { store } = state;
 
-        return ['div', [
-            ['button', { click: () => store.dispatch('INCREMENT') }, 'Increment'],
-            ['button', { click: () => store.dispatch('DECREMENT') }, 'Decrement'],
-            ['div', `Count: ${ store.getState() }`]
-        ]];
+        return c('div', [
+            c('button', { click: () => store.dispatch('INCREMENT') }, 'Increment'),
+            c('button', { click: () => store.dispatch('DECREMENT') }, 'Decrement'),
+            c('div', `Count: ${ store.getState() }`)
+        ]);
     }
 
-    var counter = createComponent(view).init({ store: counterStore });
+    let Counter = createComponent(view);
 
-    counter.mount(document.body);
+    let counter = c(Counter, { store: counterStore }).mount(document.body);
 
-    counterStore.onStateChanged(() => { debugger; counter.render() });
+    counterStore.onStateChanged(() => { counter.render() });
   </script>
 </body>
 </html>

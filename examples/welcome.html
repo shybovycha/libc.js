@@ -21,18 +21,16 @@
     };
 
     let view = (state, children, dispatch) => {
-      return ['div', [
-        ['div', [
-          ['input', { id: 'name', type: 'text' }],
-          ['button', { click: () => dispatch({ type: 'WELCOME', name: document.querySelector('#name').value }) }, 'welcome']
-        ]],
-        ['div', { style: `visibility: ${ state.name.length ? 'visible' : 'hidden' };` }, `Hello, ${ state.name }!`]
-      ]];
+      return c('div', [
+        c('div', [
+          c('input', { id: 'name', type: 'text' }),
+          c('button', { click: () => dispatch({ type: 'WELCOME', name: document.querySelector('#name').value }) }, 'welcome')
+        ]),
+        c('div', { style: `visibility: ${ state.name.length ? 'visible' : 'hidden' };` }, `Hello, ${ state.name }!`)
+      ]);
     };
 
-    let app = createComponent(view, update).init(initialState);
-
-    app.mount(document.querySelector('#app'));
+    let app = c(createComponent(view, update), initialState).mount(document.querySelector('#app'));
   </script>
 </body>
 </html>
