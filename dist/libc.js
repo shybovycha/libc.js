@@ -70,12 +70,6 @@ class VirtualDOMNode {
 
         this.attributes = {};
         this.children = [];
-        this.innerText = null;
-
-        this.parent = null;
-
-        this.elt = null;
-
         this.eventListeners = {};
     }
 
@@ -197,114 +191,6 @@ class VirtualDOMNode {
     }
 }
 
-class ComponentInstance {
-    constructor(viewFn, updateFn) {
-        this.viewFn = viewFn;
-        this.updateFn = updateFn;
-
-        this.view = null;
-        this.state = null;
-        this.children = null;
-    }
-
-    dispatch(message) {
-        let newState = this.updateFn.call(null, this.state, message);
-
-        if (deepEqual(newState, this.state))
-            return;
-
-        this.state = newState;
-
-        setImmediate(this.render.bind(this));
-    }
-
-    render() {
-        let newView = this.viewFn.call(null, this.state, this.children, this.dispatch.bind(this));
-
-        if (!this.view)
-            this.view = newView; else
-                this.view.applyChanges(newView);
-
-        return this.view;
-    }
-
-    init(state, children) {
-        this.state = state;
-        this.children = children;
-
-        return this;
-    }
-
-    mount(placeholder) {
-        this.render().mount(placeholder);
-        return this;
-    }
-}
-
-class ComponentFactory {
-    constructor(viewFn, updateFn) {
-        this.viewFn = viewFn;
-        this.updateFn = updateFn;
-    }
-
-    init(state, children) {
-        let component = new ComponentInstance(this.viewFn, this.updateFn);
-        return component.init(state, children);
-    }
-}
-
-let createComponent = (viewFn, updateFn) => new ComponentFactory(viewFn, updateFn || ((state, message) => state));
-
-let isDOM$$1 = (_arg0) => VirtualDOMNode.prototype.isPrototypeOf(_arg0);
-
-let c = function (_arg0, _arg1, _arg2) {
-    let elt = null, children = [], attrs = {}, innerText = null;
-
-    if (isArray(_arg1)) {
-        children = _arg1.slice();
-    } else if (isObject(_arg1)) {
-        attrs = _arg1;
-
-        if (isArray(_arg2))
-            children = _arg2.slice();
-        else
-            innerText = _arg2;
-    } else {
-        innerText = _arg1;
-    }
-
-    if (ComponentFactory.prototype.isPrototypeOf(_arg0)) {
-        return _arg0.init(attrs, children || innerText);
-    }
-
-    elt = new VirtualDOMNode(_arg0);
-
-    Object.keys(attrs).forEach((attrName) => {
-        let attrValue = attrs[attrName];
-
-        if (isFunction(attrValue)) {
-            elt.addEventListener(attrName, attrValue);
-        } else {
-            elt.setAttribute(attrName, attrValue);
-        }
-    });
-
-    children.forEach((child) => {
-        if (typeof (child) === 'undefined' || child == null)
-            return;
-
-        if (isDOM$$1(child)) {
-            elt.appendChild(child);
-        } else {
-            elt.appendChild(child.render());
-        }
-    });
-
-    elt.innerText = innerText;
-
-    return elt;
-};
-
 class Store {
     constructor(initialState) {
         this.state = deepCopy(initialState);
@@ -341,6 +227,100 @@ class Store {
         });
     }
 }
+
+class ComponentInstance {
+    constructor(viewFn, updateFn) {
+        this.viewFn = viewFn;
+        this.updateFn = updateFn;
+    }
+
+    render() {
+        let newView = this.viewFn.call(null, this.store.getState(), this.children, this.store.dispatch.bind(this.store));
+
+        if (!this.view)
+            this.view = newView; else
+                this.view.applyChanges(newView);
+
+        return this.view;
+    }
+
+    init(state, children) {
+        this.store = new Store(state);
+        this.children = children;
+
+        this.store.onAction(this.updateFn.bind(this));
+        this.store.onStateChanged(this.render.bind(this));
+
+        return this;
+    }
+
+    mount(placeholder) {
+        this.render().mount(placeholder);
+        return this;
+    }
+}
+
+class ComponentFactory {
+    constructor(viewFn, updateFn) {
+        this.viewFn = viewFn;
+        this.updateFn = updateFn;
+    }
+
+    init(state, children) {
+        let component = new ComponentInstance(this.viewFn, this.updateFn);
+        return component.init(state, children);
+    }
+}
+
+let createComponent = (viewFn, updateFn) => new ComponentFactory(viewFn, updateFn || ((state, message) => state));
+
+let c = function (_arg0, _arg1, _arg2) {
+    let elt, children = [], attrs = {}, innerText;
+
+    if (isArray(_arg1)) {
+        children = _arg1.slice();
+    } else if (isObject(_arg1)) {
+        attrs = _arg1;
+
+        if (isArray(_arg2))
+            children = _arg2.slice();
+        else
+            innerText = _arg2;
+    } else {
+        innerText = _arg1;
+    }
+
+    if (ComponentFactory.prototype.isPrototypeOf(_arg0)) {
+        return _arg0.init(attrs, children || innerText);
+    }
+
+    elt = new VirtualDOMNode(_arg0);
+
+    Object.keys(attrs).forEach((attrName) => {
+        let attrValue = attrs[attrName];
+
+        if (isFunction(attrValue)) {
+            elt.addEventListener(attrName, attrValue);
+        } else {
+            elt.setAttribute(attrName, attrValue);
+        }
+    });
+
+    children.forEach((child) => {
+        if (typeof (child) === 'undefined' || child == null)
+            return;
+
+        if (VirtualDOMNode.prototype.isPrototypeOf(child)) {
+            elt.appendChild(child);
+        } else {
+            elt.appendChild(child.render());
+        }
+    });
+
+    elt.innerText = innerText;
+
+    return elt;
+};
 
 if (typeof window !== 'undefined') {
   window.createComponent = createComponent;

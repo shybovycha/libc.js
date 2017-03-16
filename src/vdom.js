@@ -8,12 +8,6 @@ export class VirtualDOMNode {
 
         this.attributes = {};
         this.children = [];
-        this.innerText = null;
-
-        this.parent = null;
-
-        this.elt = null;
-
         this.eventListeners = {};
     }
 
