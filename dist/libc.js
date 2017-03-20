@@ -122,7 +122,7 @@ class VirtualDOMNode {
     }
 
     equal(node) {
-        return (this.elt && node.elt && this.elt == node.elt) && (this.text == node.text) && deepEqual(this.attributes, node.attributes) && this.children.every((child, index) => child.equal(node.children[index]));
+        return (this.elt && node.elt && this.elt == node.elt) && (this.innerText == node.innerText) && deepEqual(this.attributes, node.attributes) && this.children.every((child, index) => child.equal(node.children[index]));
     }
 
     applyChanges(elt2) {
@@ -132,15 +132,24 @@ class VirtualDOMNode {
 
         let [children, attributes, text] = [elt2.children, elt2.attributes, elt2.innerText];
 
-        children.forEach((newChild, index) => {
+        for (let index = 0; index < children.length; index++) {
+            let newChild = children[index];
+
             if (index >= this.children.length) {
                 this.children.push(newChild);
+                newChild.parent = this;
             } else if (this.children[index].equal(newChild)) {
-                return;
+                continue;
             }
 
             this.children[index].applyChanges(newChild);
-        });
+        }
+
+        for (let index = children.length; index < this.children.length; index++) {
+            this.elt.removeChild(this.children[index].elt);
+        }
+
+        this.children = this.children.slice(0, children.length);
 
         if (attributes && !deepEqual(this.attributes, attributes)) {
             Object.keys(attributes).forEach(key => {
@@ -274,6 +283,12 @@ class ComponentFactory {
 
 let createComponent = (viewFn, updateFn) => new ComponentFactory(viewFn, updateFn || ((state, message) => state));
 
+/**
+ *
+ * @param {String|ComponentFactory} _arg0 Tag name or component
+ * @param {Object} [_arg1] In case of HTML tags - attributes and event listeners; in case of components - initial state. Or children. Or inner text.
+ * @param {Array<VirtualDOMNode>|Array<ComponentFactory>|String} [_arg2] Children nodes or inner text
+ */
 let c = function (_arg0, _arg1, _arg2) {
     let elt, children = [], attrs = {}, innerText;
 

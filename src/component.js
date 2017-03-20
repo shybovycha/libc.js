@@ -49,6 +49,12 @@ export class ComponentFactory {
 
 export let createComponent = (viewFn, updateFn) => new ComponentFactory(viewFn, updateFn || ((state, message) => state));
 
+/**
+ *
+ * @param {String|ComponentFactory} _arg0 Tag name or component
+ * @param {Object} [_arg1] In case of HTML tags - attributes and event listeners; in case of components - initial state. Or children. Or inner text.
+ * @param {Array<VirtualDOMNode>|Array<ComponentFactory>|String} [_arg2] Children nodes or inner text
+ */
 export let c = function (_arg0, _arg1, _arg2) {
     let elt, children = [], attrs = {}, innerText;
 

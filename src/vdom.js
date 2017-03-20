@@ -60,7 +60,7 @@ export class VirtualDOMNode {
     }
 
     equal(node) {
-        return (this.elt && node.elt && this.elt == node.elt) && (this.text == node.text) && utils.deepEqual(this.attributes, node.attributes) && this.children.every((child, index) => child.equal(node.children[index]));
+        return (this.elt && node.elt && this.elt == node.elt) && (this.innerText == node.innerText) && utils.deepEqual(this.attributes, node.attributes) && this.children.every((child, index) => child.equal(node.children[index]));
     }
 
     applyChanges(elt2) {
@@ -70,15 +70,24 @@ export class VirtualDOMNode {
 
         let [children, attributes, text] = [elt2.children, elt2.attributes, elt2.innerText];
 
-        children.forEach((newChild, index) => {
+        for (let index = 0; index < children.length; index++) {
+            let newChild = children[index];
+
             if (index >= this.children.length) {
                 this.children.push(newChild);
+                newChild.parent = this;
             } else if (this.children[index].equal(newChild)) {
-                return;
+                continue;
             }
 
             this.children[index].applyChanges(newChild);
-        });
+        }
+
+        for (let index = children.length; index < this.children.length; index++) {
+            this.elt.removeChild(this.children[index].elt);
+        }
+
+        this.children = this.children.slice(0, children.length);
 
         if (attributes && !utils.deepEqual(this.attributes, attributes)) {
             Object.keys(attributes).forEach(key => {

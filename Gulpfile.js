@@ -46,4 +46,13 @@ gulp.task('es5-min', ['es5'], function () {
 
 gulp.task('build-es5', ['es5', 'es5-min']);
 
+gulp.task('watch-es6', ['es6'], function () {
+    gulp.watch(['src/**/*'], ['es6']);
+});
+
+gulp.task('watch-es5', ['es5'], function () {
+    gulp.watch(['src/**/*'], ['es5']);
+});
+
 gulp.task('default', ['build-es6']);
+gulp.task('watch', ['watch-es6']);
