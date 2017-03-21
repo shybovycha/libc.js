@@ -127,7 +127,7 @@ export class VirtualDOMNode {
         });
 
         utils.setImmediate(_ => {
-            this.children.forEach(child => child.mount(this.elt))
+            this.children.filter(child => !child.elt).forEach(child => child.mount(this.elt))
         });
 
         if (this.parent && this.parent.elt) {
