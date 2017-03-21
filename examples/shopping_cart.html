@@ -105,9 +105,9 @@
             return createComponent(view);
         })();
 
-        let app = c(App).mount(document.querySelector('#app'));
+        connectComponentToStore(App, cartStore);
 
-        cartStore.onStateChanged(() => app.render());
+        c(App).mount(document.querySelector('#app'));
     </script>
 </body>
 

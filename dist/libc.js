@@ -253,8 +253,8 @@ class ComponentInstance {
         return this.view;
     }
 
-    init(state, children) {
-        this.store = new Store(state);
+    init(store, children) {
+        this.store = store;
         this.children = children;
 
         this.store.onAction(this.updateFn.bind(this));
@@ -270,18 +270,29 @@ class ComponentInstance {
 }
 
 class ComponentFactory {
-    constructor(viewFn, updateFn) {
+    constructor(viewFn, updateFn, storeFactory) {
         this.viewFn = viewFn;
         this.updateFn = updateFn;
+        this.storeFactory = storeFactory;
     }
 
     init(state, children) {
         let component = new ComponentInstance(this.viewFn, this.updateFn);
-        return component.init(state, children);
+        let store = this.storeFactory.call(null, state);
+        return component.init(store, children);
     }
 }
 
-let createComponent = (viewFn, updateFn) => new ComponentFactory(viewFn, updateFn || ((state, message) => state));
+let createComponent = (viewFn, updateFn) => new ComponentFactory(viewFn, updateFn || ((state, message) => state), ((state) => new Store(state)));
+
+let connectComponentToStore = function (componentFactory, store) {
+    componentFactory.storeFactory = (state) => {
+        store.state = Object.assign({}, store.getState(), state);
+        return store;
+    };
+
+    return componentFactory;
+};
 
 /**
  *
@@ -340,6 +351,7 @@ let c = function (_arg0, _arg1, _arg2) {
 if (typeof window !== 'undefined') {
   window.createComponent = createComponent;
   window.createStore = Store.createStore;
+  window.connectComponentToStore = connectComponentToStore;
   window.c = c;
 } else if (typeof module === 'object' && module != null && module.exports) {
   module.exports = { createComponent, createStore: Store.createStore, c };
