@@ -21,10 +21,12 @@
     };
 
     let view = (state, children, dispatch) => {
+      let input = c('input', { id: 'name', type: 'text' });
+
       return c('div', [
         c('div', [
-          c('input', { id: 'name', type: 'text' }),
-          c('button', { click: () => dispatch({ type: 'WELCOME', name: document.querySelector('#name').value }) }, 'welcome')
+          input,
+          c('button', { click: () => dispatch({ type: 'WELCOME', name: input.value }) }, 'welcome')
         ]),
         c('div', { style: `visibility: ${ state.name.length ? 'visible' : 'hidden' };` }, `Hello, ${ state.name }!`)
       ]);

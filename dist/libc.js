@@ -121,6 +121,13 @@ class VirtualDOMNode {
         this.eventListeners[evtName] = listeners.slice(0, idx).concat(listeners.slice(idx, listeners.length));
     }
 
+    get value() {
+        if (this.elt)
+            return this.elt.value;
+
+        return undefined;
+    }
+
     equal(node) {
         return (this.elt && node.elt && this.elt == node.elt) && (this.innerText == node.innerText) && deepEqual(this.attributes, node.attributes) && this.children.every((child, index) => child.equal(node.children[index]));
     }
@@ -146,7 +153,8 @@ class VirtualDOMNode {
         }
 
         for (let index = children.length; index < this.children.length; index++) {
-            this.elt.removeChild(this.children[index].elt);
+            if (this.children[index].elt && this.children[index].elt.parentNode == this.elt)
+                this.elt.removeChild(this.children[index].elt);
         }
 
         this.children = this.children.slice(0, children.length);

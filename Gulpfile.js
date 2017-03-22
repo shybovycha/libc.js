@@ -46,11 +46,11 @@ gulp.task('es5-min', ['es5'], function () {
 
 gulp.task('build-es5', ['es5', 'es5-min']);
 
-gulp.task('watch-es6', ['es6'], function () {
+gulp.task('watch-es6', ['build-es6'], function () {
     gulp.watch(['src/**/*'], ['es6']);
 });
 
-gulp.task('watch-es5', ['es5'], function () {
+gulp.task('watch-es5', ['build-es5'], function () {
     gulp.watch(['src/**/*'], ['es5']);
 });
 
