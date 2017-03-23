@@ -346,7 +346,7 @@ let c = function (_arg0, _arg1, _arg2) {
 
         if (VirtualDOMNode.prototype.isPrototypeOf(child)) {
             elt.appendChild(child);
-        } else {
+        } else if (ComponentInstance.prototype.isPrototypeOf(child)) {
             elt.appendChild(child.render());
         }
     });
