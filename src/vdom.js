@@ -118,7 +118,12 @@ export class VirtualDOMNode {
 
         if (text && text != this.innerText) {
             this.innerText = text;
-            this.elt.innerText = text;
+
+            if (this.tagName == 'input') {
+                this.elt.value = text;
+            } else {
+                this.elt.innerText = text;
+            }
         }
     }
 
