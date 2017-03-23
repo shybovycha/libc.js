@@ -12,7 +12,7 @@ export let isFunction = val => getType(val) === '[object Function]';
 
 export let flatten = arr => arr.reduce((acc, e) => acc.concat(isArray(e) ? flatten(e) : [e]), []);
 
-export let setImmediate = fn => setTimeout(fn, 0);
+export let setImmediate = fn => fn(); // setTimeout(fn, 0);
 
 export let deepCopy = (val) => {
     if (isArray(val))

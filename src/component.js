@@ -33,6 +33,22 @@ export class ComponentInstance {
         this.render().mount(placeholder);
         return this;
     }
+
+    equal(other) {
+        return this.view && other.view && this.view.equal(other.view);
+    }
+
+    applyChanges(other) {
+        if (VirtualDOMNode.prototype.isPrototypeOf(other)) {
+            return this.view.applyChanges(other);
+        } else if (ComponentInstance.prototype.isPrototypeOf(other)) {
+            if (other.view) {
+                return this.view.applyChanges(other.view);
+            } else {
+                return this.view.applyChanges(other.render());
+            }
+        }
+    }
 };
 
 export class ComponentFactory {
