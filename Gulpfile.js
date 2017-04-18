@@ -3,13 +3,23 @@ var babel = require('gulp-babel');
 var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
 var rollup = require('gulp-rollup');
+var rollupBabel = require('rollup-plugin-babel');
+var removeEmptyLines = require('gulp-remove-empty-lines');
 
 gulp.task('es6', function () {
     return gulp.src('src/**/*.js')
         .pipe(rollup({
             entry: 'src/libc.js',
-            format: 'cjs'
+            format: 'cjs',
+            plugins: [
+                rollupBabel({
+                    presets: ['stage-2'],
+                    plugins: ['remove-comments'],
+                    babelrc: false
+                })
+            ]
         }))
+        .pipe(removeEmptyLines({ removeComments: true }))
         .pipe(gulp.dest('dist'));
 });
 
@@ -17,6 +27,7 @@ gulp.task('es6-min', ['es6'], function () {
     return gulp.src('dist/libc.js')
         .pipe(babel({
             presets: ['babili'],
+            plugins: ['transform-object-rest-spread'],
             babelrc: false
         }))
         .pipe(rename('libc.min.js'))
@@ -29,11 +40,15 @@ gulp.task('es5', function () {
     return gulp.src('src/**/*.js')
         .pipe(rollup({
             entry: 'src/libc.js',
-            format: 'iife'
+            format: 'iife',
+            plugins: [
+                rollupBabel({
+                    presets: [['es2015', { modules: false }]],
+                    plugins: ['transform-object-rest-spread', 'external-helpers', 'remove-comments']
+                })
+            ]
         }))
-        .pipe(babel({
-            presets: ['es2015']
-        }))
+        .pipe(removeEmptyLines({ removeComments: true }))
         .pipe(gulp.dest('dist'));
 });
 

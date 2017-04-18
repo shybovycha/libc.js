@@ -49,7 +49,56 @@
     <div id="app"></div>
 
     <script>
-        let Tabs = (function () {
+        let Tabs = (store, children) => {
+            const state = store.getState();
+
+            let currentTabIndex = state.currentTabIndex || 0;
+
+            let tabHeaders = children.map((tab, tabIndex) => {
+                return c('div', {
+                        class: `tab-header ${tabIndex == currentTabIndex ? 'selected' : ''}`,
+                        click: () => store.dispatch({
+                            type: 'SELECT_TAB',
+                            tabIndex
+                        })
+                    },
+                    [ tab.children[0] ]
+                );
+            });
+
+            let tabs = children.map((tab, tabIndex) => {
+                return c('div',
+                    { class: `tab-content ${tabIndex == currentTabIndex ? 'selected' : ''}` },
+                    tab.children.slice(1)
+                );
+            });
+
+            return c('div', [
+                c('div', { class: 'tab-headers' }, tabHeaders),
+                c('div', { class: 'tab-container' }, tabs)
+            ]);
+        };
+
+        let App = store => {
+            return c(Tabs, store, [
+                c('div', [
+                    c('div', { class: 'header' }, 'Tab #1'),
+                    c('div', 'FIRST TAB CONTENT')
+                ]),
+                c('div', [
+                    c('div', { class: 'header' }, 'Tab #2'),
+                    c('div', 'SECOND TAB CONTENT')
+                ]),
+                c('div', [
+                    c('div', { class: 'header' }, 'Tab #3'),
+                    c('div', 'THIRD TAB CONTENT')
+                ]),
+            ] );
+        };
+
+        (() => {
+            let store = createStore({});
+
             let update = (state, message) => {
                 if (message.type == 'SELECT_TAB')
                     return Object.assign({}, state, {
@@ -59,59 +108,10 @@
                 return state;
             };
 
-            let view = (state, children, dispatch) => {
-                let currentTabIndex = state.currentTabIndex || 0;
+            store.onAction(update);
 
-                let tabHeaders = children.map((tab, tabIndex) => {
-                    return c('div', {
-                            class: `tab-header ${tabIndex == currentTabIndex ? 'selected' : ''}`,
-                            click: () => dispatch({
-                                type: 'SELECT_TAB',
-                                tabIndex
-                            })
-                        },
-                        [ tab.children[0] ]
-                    );
-                });
-
-                let tabs = children.map((tab, tabIndex) => {
-                    return c('div',
-                        { class: `tab-content ${tabIndex == currentTabIndex ? 'selected' : ''}` },
-                        tab.children.slice(1)
-                    );
-                });
-
-                return c('div', [
-                    c('div', { class: 'tab-headers' }, tabHeaders),
-                    c('div', { class: 'tab-container' }, tabs)
-                ]);
-            };
-
-            return createComponent(view, update);
+            connectToStore(App, store).mount(document.querySelector('#app'));
         })();
-
-        let app = (function () {
-            let view = (state, children, dispatch) => {
-                return c(Tabs, [
-                    c('div', [
-                        c('div', { class: 'header' }, 'Tab #1'),
-                        c('div', 'FIRST TAB CONTENT')
-                    ]),
-                    c('div', [
-                        c('div', { class: 'header' }, 'Tab #2'),
-                        c('div', 'SECOND TAB CONTENT')
-                    ]),
-                    c('div', [
-                        c('div', { class: 'header' }, 'Tab #3'),
-                        c('div', 'THIRD TAB CONTENT')
-                    ]),
-                ] );
-            };
-
-            return createComponent(view);
-        })();
-
-        c(app).mount(document.querySelector('#app'));
     </script>
 </body>
 

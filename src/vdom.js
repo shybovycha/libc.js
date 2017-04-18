@@ -67,15 +67,21 @@ export class VirtualDOMNode {
     }
 
     equal(node) {
-        return (this.elt && node.elt && this.elt == node.elt) && (this.innerText == node.innerText) && utils.deepEqual(this.attributes, node.attributes) && this.children.every((child, index) => child.equal(node.children[index]));
+        return (this.elt && node.elt && this.elt == node.elt) &&
+            ((this.tagName == 'input' && this.value == node.value) || (this.tagName != 'input' && this.innerText == node.innerText)) &&
+            utils.deepEqual(this.attributes, node.attributes) &&
+            this.children.every((child, index) => child.equal(node.children[index]));
     }
 
     applyChanges(elt2) {
+        if (this.equal(elt2))
+            return;
+
         if (!this.elt) {
             this.mount();
         }
 
-        let [children, attributes, text] = [elt2.children, elt2.attributes, elt2.innerText];
+        let { children, attributes, eventListeners, innerText } = elt2;
 
         for (let index = 0; index < children.length; index++) {
             let newChild = children[index];
@@ -101,6 +107,7 @@ export class VirtualDOMNode {
             Object.keys(attributes).forEach(key => {
                 let value = attributes[key];
 
+                // skip equal attributes
                 if (this.attributes[key] == value)
                     return;
 
@@ -116,13 +123,33 @@ export class VirtualDOMNode {
             });
         }
 
-        if (text && text != this.innerText) {
-            this.innerText = text;
+        if (eventListeners && !utils.deepEqual(this.eventListeners, eventListeners)) {
+            Object.keys(this.eventListeners).forEach(event => {
+                this.eventListeners[event].forEach(handler => {
+                    this.elt.removeEventListener(event, handler);
+                });
+
+                delete this.eventListeners[event];
+            });
+
+            Object.keys(eventListeners).forEach(event => {
+                eventListeners[event].forEach(handler => {
+                    if (!this.eventListeners[event])
+                        this.eventListeners[event] = [];
+
+                    this.eventListeners[event].push(handler);
+                    this.elt.addEventListener(event, handler);
+                });
+            });
+        }
+
+        if (innerText && innerText != this.innerText) {
+            this.innerText = innerText;
 
             if (this.tagName == 'input') {
-                this.elt.value = text;
+                this.elt.value = innerText;
             } else {
-                this.elt.innerText = text;
+                this.elt.innerText = innerText;
             }
         }
     }
@@ -136,7 +163,7 @@ export class VirtualDOMNode {
         Object.keys(this.attributes).forEach(key => this.elt.setAttribute(key, this.attributes[key]));
 
         Object.keys(this.eventListeners).forEach(evtName => {
-            this.eventListeners[evtName].forEach(listener => this.elt.addEventListener(evtName, listener.bind(this.elt)));
+            this.eventListeners[evtName].forEach(listener => this.elt.addEventListener(evtName, listener, false));
         });
 
         utils.setImmediate(_ => {
@@ -148,5 +175,10 @@ export class VirtualDOMNode {
         } else if (placeholder) {
             placeholder.appendChild(this.elt);
         }
+    }
+
+    unmount() {
+        if (this.elt)
+            this.elt.parentNode.removeChild(this.elt);
     }
 }

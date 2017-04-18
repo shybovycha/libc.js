@@ -11,7 +11,7 @@
     <div id="app"></div>
 
     <script>
-        let cartStore = (function () {
+        let cartStore = (() => {
             let products = [
                 { id: 1, title: 'Product #1', description: 'Product number one in our list', quantity: 5, price: 14.87 },
                 { id: 2, title: 'Product #2', description: 'Some other product in the store', quantity: 2, price: 0.97 },
@@ -48,66 +48,55 @@
             return store;
         })();
 
-        let Cart = (function (store) {
-            let view = (state, children, dispatch) => {
-                let products = store.getState().shoppingCart || [];
+        let Cart = store => {
+            let products = store.getState().shoppingCart || [];
 
-                let productKindAmount = products.length;
-                let productsAmount = products.reduce((acc, p) => acc + p.quantity, 0);
-                let text = productKindAmount == productsAmount ? `Products in cart: ${productKindAmount}` : `Products in cart: ${productKindAmount} (${productsAmount})`;
+            let productKindAmount = products.length;
+            let productsAmount = products.reduce((acc, p) => acc + p.quantity, 0);
+            let text = productKindAmount == productsAmount ? `Products in cart: ${productKindAmount}` : `Products in cart: ${productKindAmount} (${productsAmount})`;
 
-                return c('div', [
-                    c('div',
-                        { class: 'shopping-cart' },
-                        text
+            return c('div', [
+                c('div',
+                    { class: 'shopping-cart' },
+                    text
+                )
+            ]);
+        };
+
+        let ProductList = store => {
+            let products = store.getState().products || [];
+
+            products = products.map(product => c('div', { class: 'product' }, [
+                c('div', { class: 'title' }, product.title) ,
+                c('div', { class: 'price' }, product.price) ,
+                c('div', { class: 'description' }, product.description),
+                c('div', { class: 'quantity' }, `Available: ${product.quantity}`),
+                c('div', { class: 'actions' }, [
+                    c('button',
+                        {
+                            click: () => store.dispatch({ type: 'ADD_PRODUCT_TO_CART', product }),
+                            disabled: product.quantity == 0 ? 'disabled' : undefined
+                        },
+                        'Add to cart'
                     )
-                ]);
-            };
+                ] ),
+            ] ));
 
-            return createComponent(view);
-        })(cartStore);
+            return c('div', { class: 'product-list' }, products);
+        };
 
-        let ProductList = (function (store) {
-            let view = (state, children, dispatch) => {
-                let products = store.getState().products || [];
+        let App = (store) => {
+            return c('div', [
+                c(Cart, store),
+                c(ProductList, store)
+            ]);
+        };
 
-                products = products.map(product => c('div', { class: 'product' }, [
-                    c('div', { class: 'title' }, product.title) ,
-                    c('div', { class: 'price' }, product.price) ,
-                    c('div', { class: 'description' }, product.description),
-                    c('div', { class: 'quantity' }, `Available: ${product.quantity}`),
-                    c('div', { class: 'actions' }, [
-                        c('button',
-                            {
-                                click: () => store.dispatch({ type: 'ADD_PRODUCT_TO_CART', product }),
-                                disabled: product.quantity == 0 ? 'disabled' : undefined
-                            },
-                            'Add to cart'
-                        )
-                    ] ),
-                 ] ));
+        (function () {
+            let app = connectToStore(App, cartStore);
 
-                return c('div', { class: 'product-list' }, products);
-            };
-
-            return createComponent(view);
-        })(cartStore);
-
-
-        let App = (function () {
-            let view = (state, children, dispatch) => {
-                return c('div', [
-                    c(Cart),
-                    c(ProductList)
-                ]);
-            };
-
-            return createComponent(view);
+            app.mount(document.querySelector('#app'));
         })();
-
-        connectComponentToStore(App, cartStore);
-
-        c(App).mount(document.querySelector('#app'));
     </script>
 </body>
 

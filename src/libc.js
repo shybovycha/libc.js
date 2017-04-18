@@ -1,11 +1,12 @@
-import { createComponent, c, connectComponentToStore } from './component.js';
+import { c, connectToStore } from './component.js';
 import { Store } from './store.js';
 
-if (typeof window !== 'undefined') {
-  window.createComponent = createComponent;
-  window.createStore = Store.createStore;
-  window.connectComponentToStore = connectComponentToStore;
-  window.c = c;
-} else if (typeof module === 'object' && module != null && module.exports) {
-  module.exports = { createComponent, createStore: Store.createStore, c };
+const exportsObj = { createStore: Store.createStore, c, connectToStore };
+
+if (typeof module === 'object' && module != null && module.exports) {
+  Object.assign(module, { exports: exportsObj });
+} else if (typeof exports === 'object' && exports != null) {
+  Object.assign(exports, { libc: exportsObj });
+} else if (typeof window !== 'undefined') {
+  Object.assign(window, exportsObj);
 }

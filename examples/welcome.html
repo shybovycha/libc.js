@@ -20,19 +20,24 @@
       return state;
     };
 
-    let view = (state, children, dispatch) => {
+    let App = store => {
+      let state = store.getState();
       let input = c('input', { id: 'name', type: 'text' });
 
       return c('div', [
         c('div', [
           input,
-          c('button', { click: () => dispatch({ type: 'WELCOME', name: input.value }) }, 'welcome')
+          c('button', { click: () => store.dispatch({ type: 'WELCOME', name: input.value }) }, 'welcome')
         ]),
         c('div', { style: `visibility: ${ state.name.length ? 'visible' : 'hidden' };` }, `Hello, ${ state.name }!`)
       ]);
     };
 
-    let app = c(createComponent(view, update), initialState).mount(document.querySelector('#app'));
+    let store = createStore(initialState);
+
+    store.onAction(update);
+
+    connectToStore(App, store).mount(document.querySelector('#app'));
   </script>
 </body>
 </html>

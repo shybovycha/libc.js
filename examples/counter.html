@@ -21,21 +21,15 @@
 
     counterStore.onAction(update);
 
-    function view(state) {
-        let { store } = state;
-
+    let Counter = store => {
         return c('div', [
             c('button', { click: () => store.dispatch('INCREMENT') }, 'Increment'),
             c('button', { click: () => store.dispatch('DECREMENT') }, 'Decrement'),
             c('div', `Count: ${ store.getState() }`)
         ]);
-    }
+    };
 
-    let Counter = createComponent(view);
-
-    let counter = c(Counter, { store: counterStore }).mount(document.body);
-
-    counterStore.onStateChanged(() => { counter.render() });
+    connectToStore(Counter, counterStore).mount(document.body);
   </script>
 </body>
 </html>
