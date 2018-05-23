@@ -1,456 +1,464 @@
-var chai = require('chai');
-
-chai.use(require('chai-spies'));
-
-var expect = chai.expect;
-
-var utils = require('../src/utils.js');
-var vdom = require('../src/vdom.js');
-var Store = require('../src/store.js').Store;
+import * as utils from '../src/utils.js';
+import * as vdom from '../src/vdom.js';
+import { Store } from '../src/store.js';
 
 // do not run functions in the EventLoop in tests
-utils.setImmediate = function (fn) { fn(); };
+utils.setImmediate = (fn) => fn();
 
-describe('libc', function () {
-    describe('utilities', function () {
-        describe('type checks', function () {
-            describe('isObject', function () {
-                describe('for objects', function () {
-                    it('returns true', function () {
-                        expect(utils.isObject({ moo: 'foo' })).to.be.true;
+describe('libc', () => {
+    describe('utilities', () => {
+        describe('type checks', () => {
+            describe('isObject', () => {
+                describe('for objects', () => {
+                    it('returns true', () => {
+                        expect(utils.isObject({ moo: 'foo' })).toBe(true);
                     });
                 });
 
-                describe('for arrays', function () {
-                    it('returns false', function () {
-                        expect(utils.isObject([ 1, 2, 3 ])).to.be.false;
+                describe('for arrays', () => {
+                    it('returns false', () => {
+                        expect(utils.isObject([ 1, 2, 3 ])).toBe(false);
                     });
                 });
 
-                describe('for functions', function () {
-                    it('returns false', function () {
-                        expect(utils.isObject(function () { return -1; })).to.be.false;
+                describe('for functions', () => {
+                    it('returns false', () => {
+                        expect(utils.isObject(() => -1)).toBe(false);
                     });
                 });
 
-                describe('for VirtualDOM nodes', function () {
-                    it('returns false', function () {
-                        expect(utils.isObject(new vdom.VirtualDOMNode('div'))).to.be.true;
-                    });
-                });
-            });
-
-            describe('isFunction', function () {
-                describe('for objects', function () {
-                    it('returns false', function () {
-                        expect(utils.isFunction({ moo: 'foo' })).to.be.false;
-                    });
-                });
-
-                describe('for arrays', function () {
-                    it('returns false', function () {
-                        expect(utils.isFunction([ 1, 2, 3 ])).to.be.false;
-                    });
-                });
-
-                describe('for functions', function () {
-                    it('returns true', function () {
-                        expect(utils.isFunction(function () { return -1; })).to.be.true;
-                    });
-                });
-
-                describe('for VirtualDOM nodes', function () {
-                    it('returns false', function () {
-                        expect(utils.isFunction(new vdom.VirtualDOMNode('div'))).to.be.false;
+                describe('for VirtualDOM nodes', () => {
+                    it('returns false', () => {
+                        expect(utils.isObject(new vdom.VirtualDOMNode('div'))).toBe(true);
                     });
                 });
             });
 
-            describe('isArray', function () {
-                describe('for objects', function () {
-                    it('returns false', function () {
-                        expect(utils.isArray({ moo: 'foo' })).to.be.false;
+            describe('isFunction', () => {
+                describe('for objects', () => {
+                    it('returns false', () => {
+                        expect(utils.isFunction({ moo: 'foo' })).toBe(false);
                     });
                 });
 
-                describe('for arrays', function () {
-                    it('returns true', function () {
-                        expect(utils.isArray([ 1, 2, 3 ])).to.be.true;
+                describe('for arrays', () => {
+                    it('returns false', () => {
+                        expect(utils.isFunction([ 1, 2, 3 ])).toBe(false);
                     });
                 });
 
-                describe('for functions', function () {
-                    it('returns false', function () {
-                        expect(utils.isArray(function () { return -1; })).to.be.false;
+                describe('for functions', () => {
+                    it('returns true', () => {
+                        expect(utils.isFunction(() => -1)).toBe(true);
                     });
                 });
 
-                describe('for VirtualDOM nodes', function () {
-                    it('returns false', function () {
-                        expect(utils.isArray(new vdom.VirtualDOMNode('div'))).to.be.false;
+                describe('for VirtualDOM nodes', () => {
+                    it('returns false', () => {
+                        expect(utils.isFunction(new vdom.VirtualDOMNode('div'))).toBe(false);
                     });
                 });
             });
 
-            describe('isDOM', function () {
-                describe('for objects', function () {
-                    it('returns false', function () {
-                        expect(vdom.isDOM({ moo: 'foo' })).to.be.false;
+            describe('isArray', () => {
+                describe('for objects', () => {
+                    it('returns false', () => {
+                        expect(utils.isArray({ moo: 'foo' })).toBe(false);
                     });
                 });
 
-                describe('for arrays', function () {
-                    it('returns false', function () {
-                        expect(vdom.isDOM([ 1, 2, 3 ])).to.be.false;
+                describe('for arrays', () => {
+                    it('returns true', () => {
+                        expect(utils.isArray([ 1, 2, 3 ])).toBe(true);
                     });
                 });
 
-                describe('for functions', function () {
-                    it('returns false', function () {
-                        expect(vdom.isDOM(function () { return -1; })).to.be.false;
+                describe('for functions', () => {
+                    it('returns false', () => {
+                        expect(utils.isArray(() => -1)).toBe(false);
                     });
                 });
 
-                describe('for VirtualDOM nodes', function () {
-                    it('returns true', function () {
-                        expect(vdom.isDOM(new vdom.VirtualDOMNode('div'))).to.be.true;
+                describe('for VirtualDOM nodes', () => {
+                    it('returns false', () => {
+                        expect(utils.isArray(new vdom.VirtualDOMNode('div'))).toBe(false);
+                    });
+                });
+            });
+
+            describe('isDOM', () => {
+                describe('for objects', () => {
+                    it('returns false', () => {
+                        expect(vdom.isDOM({ moo: 'foo' })).toBe(false);
+                    });
+                });
+
+                describe('for arrays', () => {
+                    it('returns false', () => {
+                        expect(vdom.isDOM([ 1, 2, 3 ])).toBe(false);
+                    });
+                });
+
+                describe('for functions', () => {
+                    it('returns false', () => {
+                        expect(vdom.isDOM(() => -1)).toBe(false);
+                    });
+                });
+
+                describe('for VirtualDOM nodes', () => {
+                    it('returns true', () => {
+                        expect(vdom.isDOM(new vdom.VirtualDOMNode('div'))).toBe(true);
                     });
                 });
             });
         });
 
-        describe('object manipulation', function () {
-            describe('deepEqual', function () {
-                describe('for two null objects', function () {
-                    it('returns true', function () {
-                        expect(utils.deepEqual(null, null)).to.be.true;
+        describe('object manipulation', () => {
+            describe('deepEqual', () => {
+                describe('for two null objects', () => {
+                    it('returns true', () => {
+                        expect(utils.deepEqual(null, null)).toBe(true);
                     });
                 });
 
-                describe('for one null and one non-null value', function () {
-                    it('returns false', function () {
-                        expect(utils.deepEqual(null, { moo: 'foo' })).to.be.false;
+                describe('for one null and one non-null value', () => {
+                    it('returns false', () => {
+                        expect(utils.deepEqual(null, { moo: 'foo' })).toBe(false);
                     });
                 });
 
-                describe('for same values', function () {
-                    it('returns true', function () {
-                        var obj = { moo: 'foo' };
+                describe('for same values', () => {
+                    it('returns true', () => {
+                        let obj = { moo: 'foo' };
 
-                        expect(utils.deepEqual(obj, obj)).to.be.true;
+                        expect(utils.deepEqual(obj, obj)).toBe(true);
                     });
                 });
 
-                describe('for two empty arrays', function () {
-                    it('returns true', function () {
-                        expect(utils.deepEqual([], [])).to.be.true;
+                describe('for two empty arrays', () => {
+                    it('returns true', () => {
+                        expect(utils.deepEqual([], [])).toBe(true);
                     });
                 });
 
-                describe('for one empty and one non-empty array', function () {
-                    it('returns false', function () {
-                        expect(utils.deepEqual([], [ 1, 2, 3 ])).to.be.false;
+                describe('for one empty and one non-empty array', () => {
+                    it('returns false', () => {
+                        expect(utils.deepEqual([], [ 1, 2, 3 ])).toBe(false);
                     });
                 });
 
-                describe('for two equal arrays', function () {
-                    it('returns true', function () {
-                        expect(utils.deepEqual([ 1, 2, 3 ], [ 1, 2, 3 ])).to.be.true;
+                describe('for two equal arrays', () => {
+                    it('returns true', () => {
+                        expect(utils.deepEqual([ 1, 2, 3 ], [ 1, 2, 3 ])).toBe(true);
                     });
                 });
 
-                describe('for two arrays with same content but different order', function () {
-                    it('returns false', function () {
-                        expect(utils.deepEqual([ 1, 2, 3 ], [ 3, 1, 2 ])).to.be.false;
+                describe('for two arrays with same content but different order', () => {
+                    it('returns false', () => {
+                        expect(utils.deepEqual([ 1, 2, 3 ], [ 3, 1, 2 ])).toBe(false);
                     });
                 });
 
-                describe('for two empty objects', function () {
-                    it('returns true', function () {
-                        expect(utils.deepEqual({}, {})).to.be.true;
+                describe('for two empty objects', () => {
+                    it('returns true', () => {
+                        expect(utils.deepEqual({}, {})).toBe(true);
                     });
                 });
 
-                describe('for one empty and one non-empty object', function () {
-                    it('returns false', function () {
-                        expect(utils.deepEqual({}, { moo: 'foo' })).to.be.false;
+                describe('for one empty and one non-empty object', () => {
+                    it('returns false', () => {
+                        expect(utils.deepEqual({}, { moo: 'foo' })).toBe(false);
                     });
                 });
 
-                describe('for deeply inequal objects', function () {
-                    it('returns false', function () {
-                        var obj1 = { k1: { k2: [ { k3: 'v3' }, { k4: 'v4' } ] } };
-                        var obj2 = { k1: { k2: [ { k3: 'v3' }, { k4: 'v5' } ] } };
+                describe('for deeply inequal objects', () => {
+                    it('returns false', () => {
+                        let obj1 = { k1: { k2: [ { k3: 'v3' }, { k4: 'v4' } ] } };
+                        let obj2 = { k1: { k2: [ { k3: 'v3' }, { k4: 'v5' } ] } };
 
-                        expect(utils.deepEqual(obj1, obj2)).to.be.false;
+                        expect(utils.deepEqual(obj1, obj2)).toBe(false);
                     });
                 });
 
-                describe('for deeply equal objects', function () {
-                    it('returns true', function () {
-                        var obj1 = { k1: { k2: [ { k3: 'v3' }, { k4: 'v4' } ] } };
-                        var obj2 = { k1: { k2: [ { k3: 'v3' }, { k4: 'v4' } ] } };
+                describe('for deeply equal objects', () => {
+                    it('returns true', () => {
+                        let obj1 = { k1: { k2: [ { k3: 'v3' }, { k4: 'v4' } ] } };
+                        let obj2 = { k1: { k2: [ { k3: 'v3' }, { k4: 'v4' } ] } };
 
-                        expect(utils.deepEqual(obj1, obj2)).to.be.true;
+                        expect(utils.deepEqual(obj1, obj2)).toBe(true);
                     });
                 });
             });
 
-            describe('deepCopy', function () {
-                describe('for array', function () {
-                    it('creates a copy', function () {
-                        var a = [];
-                        var b = utils.deepCopy(a);
+            describe('deepCopy', () => {
+                describe('for array', () => {
+                    it('creates a copy', () => {
+                        let a = [];
+                        let b = utils.deepCopy(a);
 
                         a.push(1);
 
-                        expect(a).to.eql([ 1 ]);
-                        expect(b).to.eql([]);
+                        expect(a).toEqual([ 1 ]);
+                        expect(b).toEqual([]);
                     });
                 });
 
-                describe('for object', function () {
-                    it('creates a copy', function () {
-                        var a = { name: 'moo' };
-                        var b = utils.deepCopy(a);
+                describe('for object', () => {
+                    it('creates a copy', () => {
+                        let a = { name: 'moo' };
+                        let b = utils.deepCopy(a);
 
                         a['name'] = 'bar';
 
-                        expect(a['name']).to.eql('bar');
-                        expect(b['name']).to.eql('moo');
+                        expect(a['name']).toEqual('bar');
+                        expect(b['name']).toEqual('moo');
                     });
                 });
             });
         });
 
-        describe('list manipulation', function () {
-            describe('flatten', function () {
-                describe('for empty array', function () {
-                    it('returns empty array', function () {
-                        expect(utils.flatten([])).to.eql([]);
+        describe('list manipulation', () => {
+            describe('flatten', () => {
+                describe('for empty array', () => {
+                    it('returns empty array', () => {
+                        expect(utils.flatten([])).toEqual([]);
                     });
                 });
 
-                describe('for non-empty one-dimensional array', function () {
-                    it('returns one-dimensional array', function () {
-                        expect(utils.flatten([ 1, 2, 3 ])).to.eql([ 1, 2, 3 ]);
+                describe('for non-empty one-dimensional array', () => {
+                    it('returns one-dimensional array', () => {
+                        expect(utils.flatten([ 1, 2, 3 ])).toEqual([ 1, 2, 3 ]);
                     });
                 });
 
-                describe('for non-empty complex nested array', function () {
-                    it('returns one-dimensional array', function () {
-                        expect(utils.flatten([ 1, [ 2, 3, [ 4 ], [ [ 5 ], [ 6 ] ] ] ])).to.eql([ 1, 2, 3, 4, 5, 6 ]);
+                describe('for non-empty complex nested array', () => {
+                    it('returns one-dimensional array', () => {
+                        expect(utils.flatten([ 1, [ 2, 3, [4], [ [5], [6] ] ] ])).toEqual([1, 2, 3, 4, 5, 6]);
                     });
                 });
             });
         });
     });
 
-    describe('state management', function () {
-        describe('createStore()', function () {
-            it('creates a new store', function () {
-                expect(Store.createStore()).to.be.instanceof(Store);
+    describe('state management', () => {
+        describe('createStore()', () => {
+            it('creates a new store', () => {
+                expect(Store.createStore()).toBeInstanceOf(Store);
             });
 
-            it('sets initial state', function () {
-                expect(Store.createStore({ name: 'moo' }).getState()).to.eql({ name: 'moo' });
+            it('sets initial state', () => {
+                expect(Store.createStore({ name: 'moo' }).getState()).toEqual({ name: 'moo' });
             });
         });
 
-        describe('initial state', function () {
-            it('is immutable', function () {
-                var initialState = { value: 'moo' };
-                var store = new Store(initialState);
+        describe('initial state', () => {
+            it('is immutable', () => {
+                let initialState = { value: 'moo' };
+                const store = new Store(initialState);
 
                 initialState.value = 'foo';
 
-                expect(store.getState()).to.eql({ value: 'moo' });
+                expect(store.getState()).toEqual({ value: 'moo' });
             });
         });
 
-        describe('dispatching', function () {
-            beforeEach(function () {
-                this.initialState = { value: 'moo' };
+        describe('dispatching', () => {
+            let initialState = {
+                value: 'moo'
+            };
 
-                this.reducer = chai.spy(function (state, message) {
+            let store;
+            let reducer;
+            let handler;
+
+            beforeEach(() => {
+                reducer = jest.fn((state, message) => {
                     if (message.type == 'KNOWN_MSG') {
-                        return Object.assign({}, state, { value: message.value });
+                        return Object.assign({}, state, {
+                            value: message.value
+                        });
                     }
 
                     return state;
                 });
 
-                this.handler = chai.spy();
+                handler = jest.fn();
 
-                this.store = new Store(this.initialState);
-                this.store.onAction(this.reducer);
-                this.store.onStateChanged(this.handler);
+                store = new Store(initialState);
+                store.onAction(reducer);
+                store.onStateChanged(handler);
             });
 
-            describe('known message', function() {
-                beforeEach(function () {
-                    this.changeMessage = { type: 'KNOWN_MSG', value: 'foo' };
-                    this.noChangeMessage = { type: 'KNOWN_MSG', value: 'moo' };
+            describe('known message', () => {
+                const changeMessage = {
+                    type: 'KNOWN_MSG',
+                    value: 'foo'
+                };
+
+                const noChangeMessage = {
+                    type: 'KNOWN_MSG',
+                    value: 'moo'
+                };
+
+                describe('always', () => {
+                    // it('does not mutate state directly', () => {
+                    //     expect(() => store.dispatch(changeMessage)).not.to.change(store.getState(), 'value');
+                    // });
+
+                    it('invokes reducer', () => {
+                        store.dispatch(changeMessage);
+
+                        expect(reducer).toBeCalled();
+                    });
                 });
 
-                describe('always', function () {
-                    it('does not mutate state directly', function () {
-                        expect(() => this.store.dispatch(this.changeMessage)).not.to.change(this.store.getState(), 'value');
+                describe('which does not change state', () => {
+                    beforeEach(() => {
+                        store.dispatch(noChangeMessage);
                     });
 
-                    it('invokes reducer', function () {
-                        this.store.dispatch(this.changeMessage);
-
-                        expect(this.reducer).to.have.been.called();
+                    it('does not invoke handler', () => {
+                        expect(handler).not.toBeCalled();
                     });
                 });
 
-                describe('which does not change state', function () {
+                describe('which changes state', () => {
                     beforeEach(function () {
-                        this.store.dispatch(this.noChangeMessage);
+                        store.dispatch(changeMessage);
                     });
 
-                    it('does not invoke handler', function () {
-                        expect(this.handler).not.to.have.been.called();
-                    });
-                });
-
-                describe('which changes state', function () {
-                    beforeEach(function () {
-                        this.store.dispatch(this.changeMessage);
-                    });
-
-                    it('invokes handler', function () {
-                        expect(this.handler).to.have.been.called.with({ value: 'moo' }, { value: 'foo' });
+                    it('invokes handler', () => {
+                        expect(handler).toBeCalledWith({ value: 'foo' }, { value: 'moo' });
                     });
                 });
             });
 
-            describe('unknown message', function () {
-                beforeEach(function () {
-                    this.message = { type: 'UNKNOWN', value: 'bar' };
-                });
+            describe('unknown message', () => {
+                const message = {
+                    type: 'UNKNOWN',
+                    value: 'bar'
+                };
 
-                it('does not affect state', function () {
-                    expect(() => this.store.dispatch(this.message)).not.to.change(this.store.getState(), 'value');
-                });
+                // it('does not affect state', () => {
+                //     expect(() => store.dispatch(message)).not.to.change(store.getState(), 'value');
+                // });
 
-                it('does not invoke handler', function () {
-                    this.store.dispatch(this.message)
+                it('does not invoke handler', () => {
+                    store.dispatch(message)
 
-                    expect(this.handler).not.to.have.been.called();
+                    expect(handler).not.toBeCalled();
                 });
             });
         });
     });
 
-    describe('virtual DOM', function () {
-        describe('constructing tree with', function () {
-            describe('empty node', function () {
-                xit('creates virtual DOM node', function () {});
-            });
+    // describe('virtual DOM', () => {
+    //     describe('constructing tree with', () => {
+    //         describe('empty node', () => {
+    //             xit('creates virtual DOM node', () => {});
+    //         });
 
-            describe('node with text attributes only', function () {
-                xit('creates virtual DOM node', function () {});
-            });
+    //         describe('node with text attributes only', () => {
+    //             xit('creates virtual DOM node', () => {});
+    //         });
 
-            describe('node with event listeners only', function () {
-                xit('creates virtual DOM node', function () {});
-            });
+    //         describe('node with event listeners only', () => {
+    //             xit('creates virtual DOM node', () => {});
+    //         });
 
-            describe('node with text only', function () {
-                xit('creates virtual DOM node', function () {});
-            });
+    //         describe('node with text only', () => {
+    //             xit('creates virtual DOM node', () => {});
+    //         });
 
-            describe('node with children only', function () {
-                xit('creates virtual DOM node tree', function () {});
-            });
+    //         describe('node with children only', () => {
+    //             xit('creates virtual DOM node tree', () => {});
+    //         });
 
-            describe('node with mixed parameters', function () {
-                xit('creates virtual DOM node tree', function () {});
-            });
-        });
+    //         describe('node with mixed parameters', () => {
+    //             xit('creates virtual DOM node tree', () => {});
+    //         });
+    //     });
 
-        describe('comparing', function () {
-            describe('two empty trees', function () {
-                xit('returns true', function () {});
-            });
+    //     describe('comparing', () => {
+    //         describe('two empty trees', () => {
+    //             xit('returns true', () => {});
+    //         });
 
-            describe('one empty and one non-empty trees', function () {
-                xit('returns false', function () {});
-            });
+    //         describe('one empty and one non-empty trees', () => {
+    //             xit('returns false', () => {});
+    //         });
 
-            describe('equal trees', function () {
-                xit('returns true', function () {});
-            });
+    //         describe('equal trees', () => {
+    //             xit('returns true', () => {});
+    //         });
 
-            describe('non-equal trees', function () {
-                xit('returns false', function () {});
-            });
-        });
+    //         describe('non-equal trees', () => {
+    //             xit('returns false', () => {});
+    //         });
+    //     });
 
-        describe('updating', function () {
-            describe('empty tree', function () {
-                describe('to empty tree', function () {
-                    xit('does nothing', function () {});
-                });
+    //     describe('updating', () => {
+    //         describe('empty tree', () => {
+    //             describe('to empty tree', () => {
+    //                 xit('does nothing', () => {});
+    //             });
 
-                describe('to non-empty tree', function () {
-                    xit('updates DOM tree', function () {});
-                });
-            });
+    //             describe('to non-empty tree', () => {
+    //                 xit('updates DOM tree', () => {});
+    //             });
+    //         });
 
-            describe('non-empty tree', function () {
-                describe('to update attributes', function () {
-                    xit('updates DOM', function () {});
-                });
+    //         describe('non-empty tree', () => {
+    //             describe('to update attributes', () => {
+    //                 xit('updates DOM', () => {});
+    //             });
 
-                describe('to update text', function () {
-                    xit('updates DOM', function () {});
-                });
+    //             describe('to update text', () => {
+    //                 xit('updates DOM', () => {});
+    //             });
 
-                describe('to remove children', function () {
-                    xit('updates DOM', function () {});
-                });
+    //             describe('to remove children', () => {
+    //                 xit('updates DOM', () => {});
+    //             });
 
-                describe('to add children', function () {
-                    xit('updates DOM', function () {});
-                });
+    //             describe('to add children', () => {
+    //                 xit('updates DOM', () => {});
+    //             });
 
-                describe('to update children', function () {
-                    xit('updates DOM', function () {});
-                });
-            });
-        });
-    });
+    //             describe('to update children', () => {
+    //                 xit('updates DOM', () => {});
+    //             });
+    //         });
+    //     });
+    // });
 
-    describe('application', function () {
-        describe('when mount', function () {
-            xit('invokes view function', function () {});
+    // describe('application', () => {
+    //     describe('when mount', () => {
+    //         xit('invokes view function', () => {});
 
-            xit('does not invoke update function', function () {});
+    //         xit('does not invoke update function', () => {});
 
-            xit('creates DOM structure', function () {});
-        });
+    //         xit('creates DOM structure', () => {});
+    //     });
 
-        describe('dispatching', function () {
-            describe('always', function () {
-                xit('invokes update function', function () {});
-            });
+    //     describe('dispatching', () => {
+    //         describe('always', () => {
+    //             xit('invokes update function', () => {});
+    //         });
 
-            describe('known message', function () {
-                describe('which changes state', function () {
-                    xit('invokes view function', function () {});
-                });
+    //         describe('known message', () => {
+    //             describe('which changes state', () => {
+    //                 xit('invokes view function', () => {});
+    //             });
 
-                describe('which does not change state', function () {
-                    xit('does not invoke view function', function () {});
-                });
-            });
+    //             describe('which does not change state', () => {
+    //                 xit('does not invoke view function', () => {});
+    //             });
+    //         });
 
-            describe('unknown message', function () {
-                xit('does not invoke view function', function () {});
-            });
-        });
-    });
+    //         describe('unknown message', () => {
+    //             xit('does not invoke view function', () => {});
+    //         });
+    //     });
+    // });
 });

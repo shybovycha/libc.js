@@ -8,7 +8,7 @@ architectures and [Mithrill](http://mithril.js.org) library.
 
 Prior to building a library, you'll need to install development tools: `npm install`.
 
-To build libc with ES6 syntax use `npm run-script build`. To build one with ES5 syntax use `npm run-script build-es5`.
+To build libc with ES6 syntax use `npm run-script build`.
 
 ## Examples
 
