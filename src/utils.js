@@ -10,55 +10,73 @@ export let isString = val => getType(val) === '[object String]';
 
 export let isFunction = val => getType(val) === '[object Function]';
 
-export let flatten = arr => arr.reduce((acc, e) => acc.concat(isArray(e) ? flatten(e) : [e]), []);
+export let flatten = arr => arr.reduce((acc, elt) => acc.concat(isArray(elt) ? flatten(elt) : [elt]), []);
 
-export let setImmediate = fn => fn(); // setTimeout(fn, 0);
+export let setImmediate = fn => setTimeout(fn, 0);
 
 export let deepCopy = (val) => {
-    if (isArray(val))
-        return [].slice.call(val);
+    if (isArray(val)) {
+        return Array.from(val);
+    }
 
-    if (!isObject(val))
+    if (!isObject(val)) {
         return val;
+    }
 
     let ret = {};
 
-    Object.keys(val).forEach(k => ret[k] = deepCopy(val[k]));
+    Object.keys(val).forEach(key => ret[key] = deepCopy(val[key]));
 
     return ret;
 };
 
 export let deepEqual = (obj1, obj2) => {
-    if ((obj1 === null && obj2 !== null) || (obj1 === null && obj2 !== null))
-        return false;
+    if ((obj1 === null && obj2 !== null) || 
+        (obj1 === null && obj2 !== null)) {
 
-    if (obj1 === null && obj2 === null)
+        return false;
+    }
+
+    if (obj1 === null && obj2 === null) {
         return true;
+    }
 
-    if ((!isObject(obj1) && isObject(obj2)) || (isObject(obj1) && !isObject(obj2)))
+    if ((!isObject(obj1) && isObject(obj2)) || 
+        (isObject(obj1) && !isObject(obj2))) {
+
         return false;
+    }
 
-    if (!isObject(obj1) && !isObject(obj2) && !isArray(obj1) && !isArray(obj2))
+    if (!isObject(obj1) && 
+        !isObject(obj2) && 
+        !isArray(obj1) && 
+        !isArray(obj2)) {
+
         return obj1 == obj2;
+    }
 
     let keys1 = Object.keys(obj1);
 
     for (let key of keys1) {
-        if (!obj2.hasOwnProperty(key))
+        if (!obj2.hasOwnProperty(key)) {
             return false;
+        }
 
-        if (!deepEqual(obj1[key], obj2[key]))
+        if (!deepEqual(obj1[key], obj2[key])) {
             return false;
+        }
     }
 
     let keys2 = Object.keys(obj2);
 
     for (let key of keys2) {
-        if (!obj1.hasOwnProperty(key))
+        if (!obj1.hasOwnProperty(key)) {
             return false;
+        }
 
-        if (!deepEqual(obj1[key], obj2[key]))
+        if (!deepEqual(obj1[key], obj2[key])) {
             return false;
+        }
     }
 
     return true;

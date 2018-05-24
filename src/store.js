@@ -24,7 +24,7 @@ export class Store {
     }
 
     dispatch(action) {
-        utils.setImmediate(_ => {
+        utils.setImmediate(() => {
             let oldState = utils.deepCopy(this.state);
             let newState = this.reducers.reduce((acc, fn) => fn.call(null, acc, action), this.state);
 

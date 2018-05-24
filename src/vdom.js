@@ -17,8 +17,11 @@ export class VirtualDOMNode {
     }
 
     setAttribute(attr, val) {
-        if (!!val)
+        if (val) {
             this.attributes[attr] = val;
+        } else {
+            delete this.attributes[attr];
+        }
     }
 
     getAttribute(attr) {
@@ -28,40 +31,45 @@ export class VirtualDOMNode {
     removeChild(elt) {
         let idx = this.children.indexOf(elt);
 
-        if (idx < 0)
+        if (idx < 0) {
             throw 'Children not found';
+        }
 
         this.children = this.children.slice(0, idx).concat(idx + 1, this.children.length);
     }
 
     addEventListener(evtName, handler) {
-        if (!this.eventListeners[evtName])
+        if (!this.eventListeners[evtName]) {
             this.eventListeners[evtName] = [];
+        }
 
         this.eventListeners[evtName].push(handler);
     }
 
     dispatchEvent(evt) {
-        if (!evt.type || !this.eventListeners[evt.type])
+        if (!evt.type || !this.eventListeners[evt.type]) {
             return;
+        }
 
         this.eventListeners[evt.type].forEach(fn => fn.call(this, evt));
     }
 
     removeEventListener(evtName, handler) {
-        let listeners = this.eventListeners[evtName];
+        const listeners = this.eventListeners[evtName];
 
-        if (!listeners)
+        if (!listeners) {
             return;
+        }
 
-        let idx = listeners.indexOf(handler);
+        const idx = listeners.indexOf(handler);
 
-        this.eventListeners[evtName] = listeners.slice(0, idx).concat(listeners.slice(idx, listeners.length));
+        this.eventListeners[evtName].splice(idx, 1);
     }
 
     get value() {
-        if (this.elt)
+        if (this.elt) {
             return this.elt.value;
+        }
 
         return undefined;
     }
@@ -74,8 +82,9 @@ export class VirtualDOMNode {
     }
 
     applyChanges(elt2) {
-        if (this.equal(elt2))
+        if (this.equal(elt2)) {
             return;
+        }
 
         if (!this.elt) {
             this.mount();
@@ -97,8 +106,9 @@ export class VirtualDOMNode {
         }
 
         for (let index = children.length; index < this.children.length; index++) {
-            if (this.children[index].elt && this.children[index].elt.parentNode == this.elt)
+            if (this.children[index].elt && this.children[index].elt.parentNode == this.elt) {
                 this.elt.removeChild(this.children[index].elt);
+            }
         }
 
         this.children = this.children.slice(0, children.length);
@@ -108,8 +118,9 @@ export class VirtualDOMNode {
                 let value = attributes[key];
 
                 // skip equal attributes
-                if (this.attributes[key] == value)
+                if (this.attributes[key] == value) {
                     return;
+                }
 
                 this.attributes[key] = value;
                 this.elt.setAttribute(key, value);
@@ -134,8 +145,9 @@ export class VirtualDOMNode {
 
             Object.keys(eventListeners).forEach(event => {
                 eventListeners[event].forEach(handler => {
-                    if (!this.eventListeners[event])
+                    if (!this.eventListeners[event]) {
                         this.eventListeners[event] = [];
+                    }
 
                     this.eventListeners[event].push(handler);
                     this.elt.addEventListener(event, handler);
@@ -157,17 +169,21 @@ export class VirtualDOMNode {
     mount(placeholder) {
         this.elt = document.createElement(this.tagName);
 
-        if (typeof this.innerText !== 'undefined' && this.innerText !== null)
+        if (typeof this.innerText !== 'undefined' && this.innerText !== null) {
             this.elt.innerText = this.innerText;
+        }
 
         Object.keys(this.attributes).forEach(key => this.elt.setAttribute(key, this.attributes[key]));
 
         Object.keys(this.eventListeners).forEach(evtName => {
-            this.eventListeners[evtName].forEach(listener => this.elt.addEventListener(evtName, listener, false));
+            this.eventListeners[evtName]
+                .forEach(listener => this.elt.addEventListener(evtName, listener, false));
         });
 
-        utils.setImmediate(_ => {
-            this.children.filter(child => !child.elt).forEach(child => child.mount(this.elt))
+        utils.setImmediate(() => {
+            this.children
+                .filter(child => !child.elt)
+                .forEach(child => child.mount(this.elt));
         });
 
         if (this.parent && this.parent.elt) {
@@ -178,7 +194,8 @@ export class VirtualDOMNode {
     }
 
     unmount() {
-        if (this.elt)
+        if (this.elt) {
             this.elt.parentNode.removeChild(this.elt);
+        }
     }
 }

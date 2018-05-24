@@ -8,7 +8,7 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'libc.js',
-        libraryTarget: 'commonjs'
+        libraryTarget: 'window'
     },
 
     target: 'web'
