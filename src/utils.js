@@ -14,6 +14,24 @@ export let flatten = arr => arr.reduce((acc, elt) => acc.concat(isArray(elt) ? f
 
 export let setImmediate = fn => setTimeout(fn, 0);
 
+export let memoizeFunction = (() => {
+    let cache = {};
+
+    return fn => function () {
+        const args = JSON.stringify(arguments);
+
+        if (!cache[fn]) {
+            cache[fn] = {};
+        }
+
+        if (!cache[fn][args]) {
+            cache[fn][args] = fn.apply(this, arguments);
+        }
+
+        return cache[fn][args];
+    };
+})();
+
 export let deepCopy = (val) => {
     if (isArray(val)) {
         return Array.from(val);

@@ -7,29 +7,25 @@
 </head>
 <body>
   <script>
-    var counterStore = createStore(0);
+    dispatch({ db: 0 });
 
-    function update(state, message) {
-        if (message == 'INCREMENT')
-        return state + 1;
+    registerEvent('increment', (state, _) => {
+      return { db: state + 1 };
+    });
 
-        if (message == 'DECREMENT')
-        return state - 1;
+    registerEvent('decrement', (state, _) => {
+      return { db: state - 1 };
+    });
 
-        return state;
-    }
-
-    counterStore.onAction(update);
-
-    let Counter = store => {
+    let Counter = state => {
         return c('div', [
-            c('button', { click: () => store.dispatch('INCREMENT') }, 'Increment'),
-            c('button', { click: () => store.dispatch('DECREMENT') }, 'Decrement'),
-            c('div', `Count: ${ store.getState() }`)
+            c('button', { click: () => dispatch({ increment: true }) }, 'Increment'),
+            c('button', { click: () => dispatch({ decrement: true }) }, 'Decrement'),
+            c('div', `Count: ${ state }`)
         ]);
     };
 
-    connectToStore(Counter, counterStore).mount(document.body);
+    connectToStore(Counter).mount(document.body);
   </script>
 </body>
 </html>

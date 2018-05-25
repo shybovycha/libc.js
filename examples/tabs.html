@@ -49,18 +49,13 @@
     <div id="app"></div>
 
     <script>
-        let Tabs = (store, children) => {
-            const state = store.getState();
-
+        let Tabs = (state, children) => {
             let currentTabIndex = state.currentTabIndex || 0;
 
             let tabHeaders = children.map((tab, tabIndex) => {
                 return c('div', {
                         class: `tab-header ${tabIndex == currentTabIndex ? 'selected' : ''}`,
-                        click: () => store.dispatch({
-                            type: 'SELECT_TAB',
-                            tabIndex
-                        })
+                        click: () => dispatch({ selectTab: tabIndex })
                     },
                     [ tab.children[0] ]
                 );
@@ -79,8 +74,8 @@
             ]);
         };
 
-        let App = store => {
-            return c(Tabs, store, [
+        let App = state => {
+            return c(Tabs, state, [
                 c('div', [
                     c('div', { class: 'header' }, 'Tab #1'),
                     c('div', 'FIRST TAB CONTENT')
@@ -97,20 +92,11 @@
         };
 
         (() => {
-            let store = createStore({});
+            dispatch({ db: { currentTabIndex: 0 } });
 
-            let update = (state, message) => {
-                if (message.type == 'SELECT_TAB')
-                    return Object.assign({}, state, {
-                        currentTabIndex: message.tabIndex
-                    });
+            registerEvent('selectTab', (state, tabIndex) => ({ db: { currentTabIndex: tabIndex } }));
 
-                return state;
-            };
-
-            store.onAction(update);
-
-            connectToStore(App, store).mount(document.querySelector('#app'));
+            connectToStore(App).mount(document.querySelector('#app'));
         })();
     </script>
 </body>

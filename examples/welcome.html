@@ -9,35 +9,20 @@
   <div id="app"></div>
 
   <script>
-    let initialState = {
-      name: ''
-    };
+    dispatch({ db: { name: '' } });
 
-    let update = (state, message) => {
-      if (message.type == 'WELCOME')
-        return Object.assign({}, state, { name: message.name });
+    registerEvent('welcome', (state, message) => ({ db: { name: message } }));
 
-      return state;
-    };
-
-    let App = store => {
-      let state = store.getState();
-      let input = c('input', { id: 'name', type: 'text' });
-
+    let App = ({ name = '' }) => {
       return c('div', [
         c('div', [
-          input,
-          c('button', { click: () => store.dispatch({ type: 'WELCOME', name: input.value }) }, 'welcome')
+          c('input', { id: 'name', type: 'text', input: evt => dispatch({ welcome: evt.target.value }) }),
         ]),
-        c('div', { style: `visibility: ${ state.name.length ? 'visible' : 'hidden' };` }, `Hello, ${ state.name }!`)
+        c('div', { style: `visibility: ${ name.trim().length ? 'visible' : 'hidden' };` }, `Hello, ${ name }!`)
       ]);
     };
 
-    let store = createStore(initialState);
-
-    store.onAction(update);
-
-    connectToStore(App, store).mount(document.querySelector('#app'));
+    connectToStore(App).mount(document.querySelector('#app'));
   </script>
 </body>
 </html>

@@ -55,7 +55,7 @@ export let c = function (_arg0, _arg1, _arg2) {
 };
 
 export let connectToStore = (renderFn, store) => {
-    let render = () => renderFn.call(null, store);
+    let render = () => renderFn.call(null, store.getState());
 
     let vdomnode = render();
 
