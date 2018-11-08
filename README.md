@@ -100,3 +100,7 @@ There should also be a way to set the initial state for a store in this API desi
 ### Optimize the `deepEqual` and `deepCopy` functions
 
 Those two are the most often called and yet the most expensive ones.
+
+### Consider groups of events
+
+If both `checkboxChecked`, `textInputValueChanded`, `textAreaValueChanged` and `selectValueChanged` events should set the `dirty = true` flag on a form object, how would you handle that?

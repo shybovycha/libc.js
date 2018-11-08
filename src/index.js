@@ -1,5 +1,6 @@
 import { c, connectToStore as connectComponentToStore } from './component.js';
 import { Store } from './store.js';
+import * as utils from './utils.js';
 
 // create the default store
 const store = new Store();
@@ -14,7 +15,13 @@ const registerEffect = store.registerEffect.bind(store);
 const createSelector = store.createSelector.bind(store);
 const dispatch = store.dispatch.bind(store);
 
-const connectToStore = view => connectComponentToStore(view, store);
+const connectToStore = (arg1, arg2) => {
+    if (utils.isArray(arg1)) {
+        return connectComponentToStore(arg1, arg2, store);
+    } else {
+        return connectComponentToStore(arg1, store);
+    }
+};
 
 export { c };
 
